@@ -38,7 +38,6 @@ declare global {
 class Analytics {
   private static instance: Analytics
   private isInitialized = false
-  private analyticsId: string | null = null
 
   private constructor() {}
 
@@ -56,7 +55,6 @@ class Analytics {
       return
     }
 
-    this.analyticsId = analyticsId
     this.isInitialized = true
 
     // 添加 Google Analytics 腳本

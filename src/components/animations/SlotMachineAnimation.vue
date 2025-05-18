@@ -93,3 +93,13 @@ defineExpose({
   font-size: 1.5em;
   font-weight: bold;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.winning-number {
+  background: #E3F2FD;
+  border: 2px solid #1976D2;
+  transform: scale(1.05);
+}
+</style>

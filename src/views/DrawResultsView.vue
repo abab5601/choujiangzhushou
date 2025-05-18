@@ -356,7 +356,6 @@ import { ref, computed, onMounted, shallowRef, watch } from 'vue'
 import { useLotteryStore } from '@/stores/lottery'
 import confetti from 'canvas-confetti'
 import { updateMetaInfo } from '@/utils/seo'
-import { analytics, AnalyticsEvent } from '@/utils/analytics'
 import SlotMachineAnimation from '@/components/animations/SlotMachineAnimation.vue'
 import CardAnimation from '@/components/animations/CardAnimation.vue'
 import BoxAnimation from '@/components/animations/BoxAnimation.vue'
@@ -382,9 +381,6 @@ onMounted(() => {
     twitterTitle: '開獎結果 - 中獎查詢',
     twitterDescription: '快速查看彩票中獎情況，支持多種開獎方式'
   })
-
-  // 追蹤頁面訪問
-  analytics.trackPageView('開獎結果')
 })
 
 const searchQuery = ref('')
@@ -423,11 +419,6 @@ watch(() => selectedAnimation.value, (newValue) => {
   } else {
     showRememberButton.value = false
   }
-
-  // 追蹤動畫選擇
-  analytics.trackEvent(AnalyticsEvent.ANIMATION_SELECTED, {
-    animationType: newValue
-  })
 })
 
 // 保存動畫選擇
@@ -436,11 +427,6 @@ function saveAnimationPreference() {
   lastSavedAnimation.value = selectedAnimation.value
   showRememberButton.value = false
   showNotification('已記住您的動畫選擇', 'success')
-
-  // 追蹤保存動畫偏好
-  analytics.trackEvent(AnalyticsEvent.ANIMATION_PREFERENCE_SAVED, {
-    animationType: selectedAnimation.value
-  })
 }
 
 const animationOptions = [
@@ -539,14 +525,8 @@ async function toggleWinnerStatus(id: string) {
       const newStatus = !ticket.isWinner
       if (newStatus) {
         store.markAsWinner(id)
-        analytics.trackEvent(AnalyticsEvent.WINNER_MARKED, {
-          ticketNumber: ticket.number
-        })
       } else {
         store.removeWinner(id)
-        analytics.trackEvent(AnalyticsEvent.WINNER_UNMARKED, {
-          ticketNumber: ticket.number
-        })
       }
       if (newStatus) {
         showWinningAnimation()
@@ -624,12 +604,6 @@ async function executeRandomDraw(e: Event) {
   e.preventDefault()
   if (!numberOfWinners.value || numberOfWinners.value <= 0) return
 
-  // 追蹤開始抽獎
-  analytics.trackEvent(AnalyticsEvent.DRAW_START, {
-    numberOfWinners: numberOfWinners.value,
-    animationType: selectedAnimation.value
-  })
-
   const nonWinningTickets = store.tickets.filter(t => !t.isWinner)
   if (nonWinningTickets.length === 0) {
     showNotification('沒有可抽取的號碼', 'warning')
@@ -664,12 +638,6 @@ async function executeRandomDraw(e: Event) {
     numbers: selectedTickets.map(t => t.number).join(', ')
   })
 
-  // 追蹤抽獎完成
-  analytics.trackEvent(AnalyticsEvent.DRAW_COMPLETE, {
-    numberOfWinners: selectedTickets.length,
-    winningNumbers: selectedTickets.map(t => t.number).join(',')
-  })
-
   showDrawDialog.value = false
   showNotification(`已抽出 ${selectedTickets.length} 個中獎號碼`, 'success')
 }
@@ -683,11 +651,6 @@ async function checkWinningNumbers(e: Event) {
       .split(/[,\n]/)
       .map(n => n.trim())
       .filter(n => n)
-
-    // 追蹤開始檢查中獎號碼
-    analytics.trackEvent(AnalyticsEvent.WINNING_NUMBERS_CHECKED, {
-      numberOfNumbers: numbers.length
-    })
 
     console.log('Processing numbers:', numbers)
     console.log('Current tickets:', store.tickets)
@@ -760,12 +723,6 @@ function confirmDelete(ticket: { id: string; number: string }) {
 function deleteTicket() {
   if (ticketToDelete.value) {
     store.removeTicket(ticketToDelete.value.id)
-    
-    // 追蹤刪除票券
-    analytics.trackEvent(AnalyticsEvent.TICKET_DELETED, {
-      ticketNumber: ticketToDelete.value.number
-    })
-    
     showNotification(`已刪除號碼：${ticketToDelete.value.number}`, 'info')
     showDeleteDialog.value = false
     ticketToDelete.value = null
@@ -774,23 +731,19 @@ function deleteTicket() {
 
 // 添加對篩選和搜索的追蹤
 watch(() => filterStatus.value, (newStatus) => {
-  analytics.trackEvent(AnalyticsEvent.TICKET_FILTERED, {
-    filterStatus: newStatus
-  })
+  // 追蹤篩選狀態
 })
 
 watch(() => searchQuery.value, (newQuery) => {
   if (newQuery.trim()) {
-    analytics.trackEvent(AnalyticsEvent.TICKET_SEARCHED, {
-      searchQuery: newQuery
-    })
+    // 追蹤搜索
   }
 })
 
 // 添加對查看歷史記錄的追蹤
 watch(() => showWinningHistoryDialog.value, (isShown) => {
   if (isShown) {
-    analytics.trackEvent(AnalyticsEvent.HISTORY_VIEWED)
+    // 追蹤查看歷史記錄
   }
 })
 </script>

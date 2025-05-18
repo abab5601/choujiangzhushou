@@ -17,6 +17,30 @@
         <router-view></router-view>
       </v-container>
     </v-main>
+
+    <v-footer app class="text-center d-flex flex-column">
+      <div>
+        <span class="text-caption">
+          © {{ new Date().getFullYear() }} 抽獎助手
+        </span>
+        <span class="mx-1">|</span>
+        <a
+          href="https://github.com/yourusername/choujiangzhushou"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-caption text-decoration-none"
+        >
+          GitHub
+        </a>
+        <span class="mx-1">|</span>
+        <span class="text-caption">
+          Made with <v-icon icon="mdi-heart" color="error" size="small"></v-icon> by abab5601 & AI cursor
+        </span>
+      </div>
+      <div class="text-caption mt-1">
+        Version 1.0.0
+      </div>
+    </v-footer>
   </v-app>
 </template>
 
@@ -26,5 +50,10 @@
 <style>
 .v-container {
   max-width: 1200px;
+}
+
+.v-footer {
+  background-color: rgb(var(--v-theme-surface)) !important;
+  border-top: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
 }
 </style> 

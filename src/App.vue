@@ -1,24 +1,27 @@
 <!-- src/App.vue -->
 <template>
   <v-app>
-    <v-app-bar>
-      <v-app-bar-title>抽獎助手</v-app-bar-title>
-      <v-spacer></v-spacer>
-      <v-tabs>
-        <v-tab :to="{ name: 'home' }">首頁</v-tab>
-        <v-tab :to="{ name: 'input' }">添加獎號</v-tab>
-        <v-tab :to="{ name: 'results' }">自動對獎</v-tab>
-        <v-tab :to="{ name: 'management' }">抽獎管理</v-tab>
-      </v-tabs>
+    <v-app-bar app>
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-toolbar-title>抽獎助手</v-toolbar-title>
     </v-app-bar>
 
-    <v-main>
-      <v-container>
-        <router-view></router-view>
-      </v-container>
-    </v-main>
+    <v-navigation-drawer v-model="drawer" app>
+      <v-list>
+        <v-list-item v-for="item in menuItems" :key="item.title" :to="item.path">
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
 
-    <ConsentBanner />
+    <v-main>
+      <router-view></router-view>
+    </v-main>
 
     <v-footer app class="text-center d-flex flex-column">
       <div>
@@ -46,8 +49,25 @@
   </v-app>
 </template>
 
-<script setup lang="ts">
-import ConsentBanner from '@/components/ConsentBanner.vue'
+<script lang="ts">
+import { defineComponent, ref } from 'vue'
+
+export default defineComponent({
+  name: 'App',
+  setup() {
+    const drawer = ref(false)
+    const menuItems = [
+      { title: '抽獎', path: '/', icon: 'mdi-gift' },
+      { title: '歷史記錄', path: '/history', icon: 'mdi-history' },
+      { title: '關於', path: '/about', icon: 'mdi-information' }
+    ]
+
+    return {
+      drawer,
+      menuItems
+    }
+  }
+})
 </script>
 
 <style>

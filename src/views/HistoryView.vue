@@ -2,7 +2,7 @@
 <template>
   <div class="history-view">
     <v-row>
-      <v-col cols="12" sm="6">
+      <v-col cols="12" sm="4">
         <v-card>
           <v-card-title>導出數據</v-card-title>
           <v-card-text>
@@ -19,7 +19,7 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12" sm="6">
+      <v-col cols="12" sm="4">
         <v-card>
           <v-card-title>導入數據</v-card-title>
           <v-card-text>
@@ -37,10 +37,27 @@
           </v-card-text>
         </v-card>
       </v-col>
+
+      <v-col cols="12" sm="4">
+        <v-card>
+          <v-card-title>清除數據</v-card-title>
+          <v-card-text>
+            <p class="mb-4">清除所有彩票數據（此操作不可恢復）</p>
+            <v-btn
+              color="error"
+              block
+              prepend-icon="mdi-delete"
+              @click="showClearConfirm = true"
+            >
+              清除數據
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-col>
     </v-row>
 
     <v-card class="mt-4">
-      <v-card-title>彩票歷史記錄</v-card-title>
+      <v-card-title>彩票管理</v-card-title>
       <v-card-text>
         <v-data-table
           :headers="headers"
@@ -87,6 +104,32 @@
       </v-card-text>
     </v-card>
 
+    <!-- 清除確認對話框 -->
+    <v-dialog v-model="showClearConfirm" max-width="400">
+      <v-card>
+        <v-card-title>確認清除</v-card-title>
+        <v-card-text>
+          確定要清除所有獎號數據嗎？此操作無法恢復。
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="default"
+            variant="text"
+            @click="showClearConfirm = false"
+          >
+            取消
+          </v-btn>
+          <v-btn
+            color="error"
+            @click="clearAllData"
+          >
+            確認清除
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <!-- Snackbar for notifications -->
     <v-snackbar
       v-model="showSnackbar"
@@ -109,6 +152,7 @@ const showSnackbar = ref(false)
 const snackbarText = ref('')
 const snackbarColor = ref('success')
 const fileError = ref('')
+const showClearConfirm = ref(false)
 
 const headers = [
   { title: '彩票號碼', key: 'number', sortable: true },
@@ -180,6 +224,12 @@ async function handleFileChange(file: File | File[] | null) {
 function removeTicket(id: string) {
   store.removeTicket(id)
   showNotification('彩票已刪除', 'info')
+}
+
+function clearAllData() {
+  store.clearAllData()
+  showClearConfirm.value = false
+  showNotification('所有數據已清除', 'success')
 }
 
 function showNotification(text: string, color: 'success' | 'error' | 'info') {

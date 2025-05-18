@@ -127,10 +127,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useLotteryStore } from '@/stores/lottery'
+import { updateMetaInfo } from '@/utils/seo'
 
 const store = useLotteryStore()
+
+// SEO 優化
+onMounted(() => {
+  updateMetaInfo({
+    title: '彩票輸入',
+    description: '提供單張輸入、批量輸入和範圍輸入三種方式，方便快速添加彩票號碼',
+    keywords: '彩票輸入,批量輸入,範圍輸入,彩票號碼,彩票管理',
+    ogTitle: '彩票輸入 - 多種輸入方式',
+    ogDescription: '提供多種便捷的彩票號碼輸入方式，支持單張、批量和範圍輸入',
+    twitterTitle: '彩票輸入 - 多種輸入方式',
+    twitterDescription: '提供多種便捷的彩票號碼輸入方式，支持單張、批量和範圍輸入'
+  })
+})
 
 const activeInputTab = ref('single')
 const singleTicket = ref('')

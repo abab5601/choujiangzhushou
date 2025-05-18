@@ -221,6 +221,8 @@
       v-model="showSnackbar"
       :color="snackbarColor"
       :timeout="3000"
+      location="bottom"
+      class="custom-snackbar"
     >
       {{ snackbarText }}
     </v-snackbar>
@@ -309,12 +311,30 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useLotteryStore, type WinningHistoryEntry } from '@/stores/lottery'
+import confetti from 'canvas-confetti'
+import { updateMetaInfo } from '@/utils/seo'
 
 const store = useLotteryStore()
+
+// 添加調試日誌
+console.log('Store instance:', store)
+console.log('Store methods:', Object.keys(store))
+console.log('Store actions:', Object.keys(store.$state))
 
 // Load data when component is mounted
 onMounted(() => {
   store.loadFromStorage()
+  
+  // SEO 優化
+  updateMetaInfo({
+    title: '開獎結果',
+    description: '查看彩票中獎情況，支持手動輸入中獎號碼和隨機抽獎功能',
+    keywords: '彩票開獎,中獎查詢,隨機抽獎,開獎歷史,彩票管理',
+    ogTitle: '開獎結果 - 中獎查詢',
+    ogDescription: '快速查看彩票中獎情況，支持多種開獎方式',
+    twitterTitle: '開獎結果 - 中獎查詢',
+    twitterDescription: '快速查看彩票中獎情況，支持多種開獎方式'
+  })
 })
 
 const searchQuery = ref('')
@@ -361,107 +381,197 @@ const sortedWinningHistory = computed(() => {
   return [...history].sort((a, b) => b.timestamp - a.timestamp)
 })
 
-function toggleWinnerStatus(id: string) {
-  const ticket = store.tickets.find(t => t.id === id)
-  if (ticket) {
-    if (ticket.isWinner) {
-      store.removeWinner(id)
-      showNotification('已取消中獎狀態', 'info')
-    } else {
-      store.markAsWinner(id)
-      showNotification('已標記為中獎', 'success')
-    }
+// 彩帶效果函數
+function showWinningAnimation() {
+  const count = 200
+  const defaults = {
+    origin: { y: 0.7 },
+    spread: 360,
+    ticks: 50,
+    gravity: 0,
+    decay: 0.94,
+    startVelocity: 30,
+    shapes: ['star'],
+    colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8'],
+    zIndex: 10000  // 設置非常高的 z-index
   }
-}
 
-function executeRandomDraw() {
-  const availableTickets = store.tickets.filter(t => !t.isWinner)
-  const count = Math.min(numberOfWinners.value, availableTickets.length)
-  
-  // Fisher-Yates shuffle
-  for (let i = availableTickets.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [availableTickets[i], availableTickets[j]] = [availableTickets[j], availableTickets[i]]
+  function fire(particleRatio: number, opts: any) {
+    confetti({
+      ...defaults,
+      ...opts,
+      particleCount: Math.floor(count * particleRatio),
+      zIndex: 10000  // 確保每次調用都設置 z-index
+    })
   }
-  
-  // Select winners
-  const selectedWinners = availableTickets.slice(0, count)
-  selectedWinners.forEach(ticket => {
-    store.markAsWinner(ticket.id)
+
+  fire(0.25, {
+    spread: 26,
+    startVelocity: 55,
   })
 
-  // 記錄本次抽獎
-  if (selectedWinners.length > 0) {
-    const entry: WinningHistoryEntry = {
-      timestamp: Date.now(),
-      numbers: selectedWinners.map(t => t.number).join(', ')
-    }
-    store.addWinningHistory(entry)
-  }
-  
-  // 準備顯示結果
-  lotteryResults.value = {
-    matched: selectedWinners.map(ticket => ({
-      number: ticket.number,
-      isNew: true
-    })),
-    notFound: []
-  }
-  
-  showDrawDialog.value = false
-  numberOfWinners.value = 1
-  showResultsDialog.value = true // 顯示結果對話框
-  showNotification(`已選出 ${count} 個中獎號碼`, 'success')
+  fire(0.2, {
+    spread: 60,
+  })
+
+  fire(0.35, {
+    spread: 100,
+    decay: 0.91,
+    scalar: 0.8
+  })
+
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 25,
+    decay: 0.92,
+    scalar: 1.2
+  })
+
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 45,
+  })
 }
 
-function checkWinningNumbers() {
-  if (!winningNumbers.value.trim()) return
-
-  const numbers = winningNumbers.value
-    .split(/[,\n]/)
-    .map(n => n.trim())
-    .filter(n => n)
-
-  lotteryResults.value = {
-    matched: [],
-    notFound: []
-  }
-
-  numbers.forEach(number => {
-    const ticket = store.tickets.find(t => t.number === number)
+async function toggleWinnerStatus(id: string) {
+  try {
+    const ticket = store.tickets.find(t => t.id === id)
     if (ticket) {
-      const isNew = !ticket.isWinner
-      if (isNew) {
-        store.markAsWinner(ticket.id)
+      const newStatus = !ticket.isWinner
+      if (newStatus) {
+        store.markAsWinner(id)
+      } else {
+        store.removeWinner(id)
       }
-      lotteryResults.value.matched.push({ number, isNew })
-    } else {
-      lotteryResults.value.notFound.push(number)
+      if (newStatus) {
+        showWinningAnimation()
+      }
     }
-  })
+  } catch (error) {
+    console.error('更新中獎狀態時出錯:', error)
+    snackbarText.value = '更新中獎狀態時出錯'
+    snackbarColor.value = 'error'
+    showSnackbar.value = true
+  }
+}
 
-  // 記錄本次開獎
-  if (lotteryResults.value.matched.length > 0) {
-    const entry: WinningHistoryEntry = {
-      timestamp: Date.now(),
-      numbers: numbers.join(', ')
-    }
-    store.addWinningHistory(entry)
+async function executeRandomDraw(e: Event) {
+  e.preventDefault()
+  if (!numberOfWinners.value || numberOfWinners.value <= 0) return
+
+  const nonWinners = store.tickets.filter(t => !t.isWinner)
+  if (nonWinners.length === 0) {
+    snackbarText.value = '沒有可抽獎的號碼'
+    snackbarColor.value = 'warning'
+    showSnackbar.value = true
+    return
   }
 
-  showWinningNumberDialog.value = false
-  winningNumbers.value = ''
-  showResultsDialog.value = true
+  try {
+    // 隨機抽取指定數量的中獎號碼
+    const shuffled = [...nonWinners].sort(() => Math.random() - 0.5)
+    const winners = shuffled.slice(0, numberOfWinners.value)
 
-  // 更新通知消息
-  const newWinners = lotteryResults.value.matched.filter(t => t.isNew)
-  if (newWinners.length > 0) {
-    showNotification(
-      `找到 ${newWinners.length} 個新中獎號碼`,
-      'success'
-    )
-  } else {
-    showNotification('沒有新的中獎號碼', 'info')
+    // 準備結果顯示
+    lotteryResults.value = {
+      matched: [],
+      notFound: []
+    }
+
+    // 更新中獎狀態
+    for (const winner of winners) {
+      store.markAsWinner(winner.id)
+      lotteryResults.value.matched.push({
+        number: winner.number,
+        isNew: true
+      })
+    }
+
+    // 記錄本次抽獎
+    store.addWinningHistory({
+      timestamp: Date.now(),
+      numbers: winners.map(w => w.number).join(', ')
+    })
+
+    showDrawDialog.value = false
+    snackbarText.value = `已成功抽出 ${winners.length} 個中獎號碼`
+    snackbarColor.value = 'success'
+    showSnackbar.value = true
+    showResultsDialog.value = true  // 顯示結果對話框
+    
+    // 觸發彩帶效果
+    showWinningAnimation()
+  } catch (error) {
+    console.error('抽獎過程中出錯:', error)
+    snackbarText.value = '抽獎過程中出錯'
+    snackbarColor.value = 'error'
+    showSnackbar.value = true
+  }
+}
+
+async function checkWinningNumbers(e: Event) {
+  e.preventDefault()
+  if (!winningNumbers.value) return
+
+  try {
+    const numbers = winningNumbers.value
+      .split(/[,\n]/)
+      .map(n => n.trim())
+      .filter(n => n)
+
+    console.log('Processing numbers:', numbers)
+    console.log('Current tickets:', store.tickets)
+
+    let winCount = 0
+    lotteryResults.value = {
+      matched: [],
+      notFound: []
+    }
+
+    // 檢查每個號碼
+    for (const number of numbers) {
+      const ticket = store.tickets.find(t => t.number === number)
+      if (ticket) {
+        const isNew = !ticket.isWinner
+        if (isNew) {
+          store.markAsWinner(ticket.id)
+          winCount++
+        }
+        lotteryResults.value.matched.push({ number, isNew })
+      } else {
+        lotteryResults.value.notFound.push(number)
+      }
+    }
+
+    showWinningNumberDialog.value = false
+    winningNumbers.value = ''  // 清空輸入
+    
+    if (winCount > 0) {
+      console.log(`Found ${winCount} winning tickets`)
+      snackbarText.value = `找到 ${winCount} 個中獎號碼`
+      snackbarColor.value = 'success'
+      showSnackbar.value = true
+      showResultsDialog.value = true  // 顯示結果對話框
+      // 觸發彩帶效果
+      showWinningAnimation()
+    } else {
+      console.log('No winning tickets found')
+      snackbarText.value = '沒有找到中獎號碼'
+      snackbarColor.value = 'info'
+      showSnackbar.value = true
+      showResultsDialog.value = true  // 仍然顯示結果對話框
+    }
+  } catch (error) {
+    console.error('處理中獎號碼時出錯:', error)
+    console.error('Error details:', {
+      error,
+      store: store,
+      storeActions: Object.keys(store),
+      tickets: store.tickets
+    })
+    snackbarText.value = '處理中獎號碼時出錯'
+    snackbarColor.value = 'error'
+    showSnackbar.value = true
   }
 }
 
@@ -490,5 +600,17 @@ function deleteTicket() {
 <style scoped>
 .draw-results-view {
   padding: 16px 0;
+}
+
+/* 確保通知顯示在最上層 */
+:deep(.v-snackbar) {
+  z-index: 24999 !important;
+}
+
+/* 確保彩帶效果容器在最上層 */
+:deep(.confetti-container) {
+  z-index: 10000 !important;
+  position: fixed !important;
+  pointer-events: none !important;
 }
 </style> 

@@ -24,6 +24,12 @@ export const useLotteryStore = defineStore('lottery', {
     winningHistory: [] as WinningHistoryEntry[]
   }),
 
+  getters: {
+    totalTickets: (state) => state.tickets.length,
+    totalWinners: (state) => state.winners.length,
+    nonWinningTickets: (state) => state.tickets.filter(t => !t.isWinner)
+  },
+
   actions: {
     loadFromStorage() {
       const savedTickets = localStorage.getItem('lottery-tickets')
@@ -176,6 +182,33 @@ export const useLotteryStore = defineStore('lottery', {
       this.winners = []
       this.winningHistory = []
       this.saveToStorage()
+    },
+
+    updateTicketStatus(id: string, isWinner: boolean) {
+      console.log('updateTicketStatus called with:', { id, isWinner })
+      console.log('Current tickets:', this.tickets)
+      console.log('Store instance:', this)
+      
+      const ticket = this.tickets.find(t => t.id === id)
+      console.log('Found ticket:', ticket)
+      
+      if (ticket) {
+        ticket.isWinner = isWinner
+        this.winners = this.tickets.filter(t => t.isWinner)
+        this.saveToStorage()
+        
+        if (isWinner) {
+          console.log('Adding to winning history:', ticket)
+          this.addWinningHistory({
+            timestamp: Date.now(),
+            numbers: ticket.number
+          })
+        }
+        
+        console.log('Ticket status updated successfully')
+      } else {
+        console.warn('Ticket not found:', id)
+      }
     }
   }
 }) 

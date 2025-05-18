@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { ref, watch } from 'vue'
 
 interface Ticket {
   id: string
@@ -17,198 +18,230 @@ export interface ImportResult {
   error?: string
 }
 
-export const useLotteryStore = defineStore('lottery', {
-  state: () => ({
-    tickets: [] as Ticket[],
-    winners: [] as Ticket[],
-    winningHistory: [] as WinningHistoryEntry[]
-  }),
+export const useLotteryStore = defineStore('lottery', () => {
+  const tickets = ref<Ticket[]>([])
+  const winners = ref<Ticket[]>([])
+  const winningHistory = ref<WinningHistoryEntry[]>([])
 
-  getters: {
-    totalTickets: (state) => state.tickets.length,
-    totalWinners: (state) => state.winners.length,
-    nonWinningTickets: (state) => state.tickets.filter(t => !t.isWinner)
-  },
+  // 監聽 tickets 變化，自動更新 winners
+  watch(tickets, (newTickets) => {
+    winners.value = newTickets.filter(t => t.isWinner)
+  }, { deep: true })
 
-  actions: {
-    loadFromStorage() {
-      const savedTickets = localStorage.getItem('lottery-tickets')
-      const savedHistory = localStorage.getItem('lottery-winning-history')
-      
-      if (savedTickets) {
-        try {
-          this.tickets = JSON.parse(savedTickets)
-          this.winners = this.tickets.filter(t => t.isWinner)
-        } catch (error) {
-          console.error('加載本地數據失敗:', error)
-        }
-      }
-
-      if (savedHistory) {
-        try {
-          this.winningHistory = JSON.parse(savedHistory)
-        } catch (error) {
-          console.error('加載開獎歷史失敗:', error)
-        }
-      }
-    },
-
-    saveToStorage() {
+  function loadFromStorage() {
+    const savedTickets = localStorage.getItem('lottery-tickets')
+    const savedHistory = localStorage.getItem('lottery-winning-history')
+    
+    if (savedTickets) {
       try {
-        localStorage.setItem('lottery-tickets', JSON.stringify(this.tickets))
-        localStorage.setItem('lottery-winning-history', JSON.stringify(this.winningHistory))
+        tickets.value = JSON.parse(savedTickets)
+        winners.value = tickets.value.filter(t => t.isWinner)
       } catch (error) {
-        console.error('保存數據失敗:', error)
+        console.error('加載本地數據失敗:', error)
       }
-    },
+    }
 
-    addTicket(number: string) {
+    if (savedHistory) {
+      try {
+        winningHistory.value = JSON.parse(savedHistory)
+      } catch (error) {
+        console.error('加載開獎歷史失敗:', error)
+      }
+    }
+
+    // 添加 storage 事件監聽器，用於多標籤頁同步
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'lottery-tickets') {
+        try {
+          const newTickets = JSON.parse(e.newValue || '[]')
+          tickets.value = newTickets
+          winners.value = tickets.value.filter(t => t.isWinner)
+        } catch (error) {
+          console.error('同步數據失敗:', error)
+        }
+      } else if (e.key === 'lottery-winning-history') {
+        try {
+          winningHistory.value = JSON.parse(e.newValue || '[]')
+        } catch (error) {
+          console.error('同步開獎歷史失敗:', error)
+        }
+      }
+    })
+  }
+
+  function saveToStorage() {
+    try {
+      localStorage.setItem('lottery-tickets', JSON.stringify(tickets.value))
+      localStorage.setItem('lottery-winning-history', JSON.stringify(winningHistory.value))
+    } catch (error) {
+      console.error('保存數據失敗:', error)
+    }
+  }
+
+  function addTicket(number: string) {
+    const ticket: Ticket = {
+      id: Date.now().toString(),
+      number: number,
+      timestamp: Date.now(),
+      isWinner: false
+    }
+    tickets.value.push(ticket)
+    saveToStorage()
+  }
+
+  function addBatchTickets(numbers: string[]) {
+    numbers.forEach(number => addTicket(number))
+  }
+
+  function addRangeTickets(start: string, end: string) {
+    const prefix = start.match(/^[A-Z]+/)?.[0] || ''
+    const startNum = parseInt(start.replace(/^[A-Z]+/, ''))
+    const endNum = parseInt(end.replace(/^[A-Z]+/, ''))
+
+    if (isNaN(startNum) || isNaN(endNum)) return
+
+    const numbers: string[] = []
+    for (let i = startNum; i <= endNum; i++) {
+      const number = `${prefix}${i.toString().padStart(3, '0')}`
+      numbers.push(number)
+    }
+
+    // 按順序一次性添加所有號碼
+    numbers.forEach(number => {
       const ticket: Ticket = {
-        id: Date.now().toString(),
+        id: Date.now().toString() + Math.random().toString(36).slice(2),
         number: number,
         timestamp: Date.now(),
         isWinner: false
       }
-      this.tickets.push(ticket)
-      this.saveToStorage()
-    },
+      tickets.value.push(ticket)
+    })
+    
+    saveToStorage()
+  }
 
-    addBatchTickets(numbers: string[]) {
-      numbers.forEach(number => this.addTicket(number))
-    },
+  function markAsWinner(id: string) {
+    const ticket = tickets.value.find(t => t.id === id)
+    if (ticket) {
+      ticket.isWinner = true
+      winners.value = tickets.value.filter(t => t.isWinner)
+      saveToStorage()
+    }
+  }
 
-    addRangeTickets(start: string, end: string) {
-      const prefix = start.match(/^[A-Z]+/)?.[0] || ''
-      const startNum = parseInt(start.replace(/^[A-Z]+/, ''))
-      const endNum = parseInt(end.replace(/^[A-Z]+/, ''))
+  function removeWinner(id: string) {
+    const ticket = tickets.value.find(t => t.id === id)
+    if (ticket) {
+      ticket.isWinner = false
+      winners.value = tickets.value.filter(t => t.isWinner)
+      saveToStorage()
+    }
+  }
 
-      if (isNaN(startNum) || isNaN(endNum)) return
+  function removeTicket(id: string) {
+    const index = tickets.value.findIndex(t => t.id === id)
+    if (index !== -1) {
+      tickets.value.splice(index, 1)
+      winners.value = tickets.value.filter(t => t.isWinner)
+      saveToStorage()
+    }
+  }
 
-      const numbers: string[] = []
-      for (let i = startNum; i <= endNum; i++) {
-        const number = `${prefix}${i.toString().padStart(3, '0')}`
-        numbers.push(number)
-      }
+  function addWinningHistory(entry: WinningHistoryEntry) {
+    winningHistory.value.push(entry)
+    saveToStorage()
+  }
 
-      // 按順序一次性添加所有號碼
-      numbers.forEach(number => {
-        const ticket: Ticket = {
-          id: Date.now().toString() + Math.random().toString(36).slice(2),
-          number: number,
-          timestamp: Date.now(),
-          isWinner: false
-        }
-        this.tickets.push(ticket)
-      })
+  function exportTickets() {
+    return JSON.stringify({
+      tickets: tickets.value,
+      winningHistory: winningHistory.value,
+      exportDate: new Date().toISOString()
+    }, null, 2)
+  }
+
+  function importTickets(jsonString: string): ImportResult {
+    try {
+      const data = JSON.parse(jsonString)
       
-      this.saveToStorage()
-    },
-
-    markAsWinner(id: string) {
-      const ticket = this.tickets.find(t => t.id === id)
-      if (ticket) {
-        ticket.isWinner = true
-        this.winners = this.tickets.filter(t => t.isWinner)
-        this.saveToStorage()
+      if (!data || typeof data !== 'object') {
+        return { success: false, error: '無效的數據格式' }
       }
-    },
 
-    removeWinner(id: string) {
-      const ticket = this.tickets.find(t => t.id === id)
-      if (ticket) {
-        ticket.isWinner = false
-        this.winners = this.tickets.filter(t => t.isWinner)
-        this.saveToStorage()
-      }
-    },
-
-    removeTicket(id: string) {
-      const index = this.tickets.findIndex(t => t.id === id)
-      if (index !== -1) {
-        this.tickets.splice(index, 1)
-        this.winners = this.tickets.filter(t => t.isWinner)
-        this.saveToStorage()
-      }
-    },
-
-    addWinningHistory(entry: WinningHistoryEntry) {
-      this.winningHistory.push(entry)
-      this.saveToStorage()
-    },
-
-    exportTickets() {
-      return JSON.stringify({
-        tickets: this.tickets,
-        winningHistory: this.winningHistory,
-        exportDate: new Date().toISOString()
-      }, null, 2)
-    },
-
-    importTickets(jsonString: string): ImportResult {
-      try {
-        const data = JSON.parse(jsonString)
-        
-        if (!data || typeof data !== 'object') {
-          return { success: false, error: '無效的數據格式' }
-        }
-
-        if (Array.isArray(data.tickets)) {
-          this.tickets = data.tickets
-          this.winners = this.tickets.filter(t => t.isWinner)
-        } else if (Array.isArray(data)) {
-          this.tickets = data
-          this.winners = this.tickets.filter(t => t.isWinner)
-        } else {
-          return { success: false, error: '找不到有效的票據數據' }
-        }
-
-        if (Array.isArray(data.winningHistory)) {
-          this.winningHistory = data.winningHistory
-        }
-
-        this.saveToStorage()
-        return { success: true }
-      } catch (error) {
-        console.error('導入數據時出錯:', error)
-        return { 
-          success: false, 
-          error: error instanceof Error ? error.message : '導入數據時出錯'
-        }
-      }
-    },
-
-    clearAllData() {
-      this.tickets = []
-      this.winners = []
-      this.winningHistory = []
-      this.saveToStorage()
-    },
-
-    updateTicketStatus(id: string, isWinner: boolean) {
-      console.log('updateTicketStatus called with:', { id, isWinner })
-      console.log('Current tickets:', this.tickets)
-      console.log('Store instance:', this)
-      
-      const ticket = this.tickets.find(t => t.id === id)
-      console.log('Found ticket:', ticket)
-      
-      if (ticket) {
-        ticket.isWinner = isWinner
-        this.winners = this.tickets.filter(t => t.isWinner)
-        this.saveToStorage()
-        
-        if (isWinner) {
-          console.log('Adding to winning history:', ticket)
-          this.addWinningHistory({
-            timestamp: Date.now(),
-            numbers: ticket.number
-          })
-        }
-        
-        console.log('Ticket status updated successfully')
+      if (Array.isArray(data.tickets)) {
+        tickets.value = data.tickets
+        winners.value = tickets.value.filter(t => t.isWinner)
+      } else if (Array.isArray(data)) {
+        tickets.value = data
+        winners.value = tickets.value.filter(t => t.isWinner)
       } else {
-        console.warn('Ticket not found:', id)
+        return { success: false, error: '找不到有效的票據數據' }
+      }
+
+      if (Array.isArray(data.winningHistory)) {
+        winningHistory.value = data.winningHistory
+      }
+
+      saveToStorage()
+      return { success: true }
+    } catch (error) {
+      console.error('導入數據時出錯:', error)
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : '導入數據時出錯'
       }
     }
+  }
+
+  function clearAllData() {
+    tickets.value = []
+    winners.value = []
+    winningHistory.value = []
+    saveToStorage()
+  }
+
+  function updateTicketStatus(id: string, isWinner: boolean) {
+    console.log('updateTicketStatus called with:', { id, isWinner })
+    console.log('Current tickets:', tickets.value)
+    
+    const ticket = tickets.value.find(t => t.id === id)
+    console.log('Found ticket:', ticket)
+    
+    if (ticket) {
+      ticket.isWinner = isWinner
+      winners.value = tickets.value.filter(t => t.isWinner)
+      saveToStorage()
+      
+      if (isWinner) {
+        console.log('Adding to winning history:', ticket)
+        addWinningHistory({
+          timestamp: Date.now(),
+          numbers: ticket.number
+        })
+      }
+      
+      console.log('Ticket status updated successfully')
+    } else {
+      console.warn('Ticket not found:', id)
+    }
+  }
+
+  return {
+    tickets,
+    winners,
+    winningHistory,
+    loadFromStorage,
+    saveToStorage,
+    addTicket,
+    addBatchTickets,
+    addRangeTickets,
+    markAsWinner,
+    removeWinner,
+    removeTicket,
+    addWinningHistory,
+    exportTickets,
+    importTickets,
+    clearAllData,
+    updateTicketStatus
   }
 }) 

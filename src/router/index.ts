@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import TicketInputView from '../views/TicketInputView.vue'
 import DrawResultsView from '../views/DrawResultsView.vue'
 import HistoryView from '../views/HistoryView.vue'
+import AboutView from '../views/AboutView.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/management',
       name: 'management',
       component: HistoryView
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: AboutView
     }
   ]
 })

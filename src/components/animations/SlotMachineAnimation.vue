@@ -33,12 +33,20 @@ watch(() => props.winningNumbers, (newNumbers) => {
   displayNumbers.value = Array(newNumbers.length).fill('')
 }, { immediate: true })
 
+// 監聽動畫狀態
+watch(() => props.isAnimating, (isAnimating) => {
+  if (!isAnimating) {
+    // 清空顯示的號碼
+    displayNumbers.value = Array(props.winningNumbers.length).fill('')
+  }
+})
+
 // 執行動畫
 async function animate(duration: number, interval: number): Promise<void> {
   const endTime = Date.now() + duration
   
   // 動畫過程
-  while (Date.now() < endTime) {
+  while (Date.now() < endTime && props.isAnimating) {
     // 生成不重複的隨機號碼
     const tempNumbers = [...props.availableNumbers]
     displayNumbers.value = Array(props.winningNumbers.length).fill('').map(() => {
@@ -50,10 +58,26 @@ async function animate(duration: number, interval: number): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, interval))
   }
   
+  // 如果動畫被取消，清空顯示的號碼
+  if (!props.isAnimating) {
+    displayNumbers.value = Array(props.winningNumbers.length).fill('')
+    return
+  }
+  
   // 顯示最終結果
   for (let i = 0; i < props.winningNumbers.length; i++) {
+    if (!props.isAnimating) {
+      // 清空顯示的號碼
+      displayNumbers.value = Array(props.winningNumbers.length).fill('')
+      break
+    }
     displayNumbers.value[i] = props.winningNumbers[i]
     await new Promise(resolve => setTimeout(resolve, 200))
+  }
+
+  if (!props.isAnimating) {
+    // 清空顯示的號碼
+    displayNumbers.value = Array(props.winningNumbers.length).fill('')
   }
 }
 

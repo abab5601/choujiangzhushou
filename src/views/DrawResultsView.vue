@@ -346,6 +346,15 @@
             </div>
           </div>
         </v-card-text>
+        <v-card-actions v-if="isAnimating">
+          <v-spacer></v-spacer>
+          <v-btn
+            color="error"
+            @click="cancelAnimation"
+          >
+            取消抽獎
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -356,7 +365,6 @@ import { ref, computed, onMounted, shallowRef, watch } from 'vue'
 import { useLotteryStore } from '@/stores/lottery'
 import confetti from 'canvas-confetti'
 import { updateMetaInfo } from '@/utils/seo'
-import { analytics, AnalyticsEvent } from '@/utils/analytics'
 import SlotMachineAnimation from '@/components/animations/SlotMachineAnimation.vue'
 import CardAnimation from '@/components/animations/CardAnimation.vue'
 import BoxAnimation from '@/components/animations/BoxAnimation.vue'
@@ -382,9 +390,6 @@ onMounted(() => {
     twitterTitle: '開獎結果 - 中獎查詢',
     twitterDescription: '快速查看彩票中獎情況，支持多種開獎方式'
   })
-
-  // 追蹤頁面訪問
-  analytics.trackPageView('開獎結果')
 })
 
 const searchQuery = ref('')
@@ -423,11 +428,6 @@ watch(() => selectedAnimation.value, (newValue) => {
   } else {
     showRememberButton.value = false
   }
-
-  // 追蹤動畫選擇
-  analytics.trackEvent(AnalyticsEvent.ANIMATION_SELECTED, {
-    animationType: newValue
-  })
 })
 
 // 保存動畫選擇
@@ -436,11 +436,6 @@ function saveAnimationPreference() {
   lastSavedAnimation.value = selectedAnimation.value
   showRememberButton.value = false
   showNotification('已記住您的動畫選擇', 'success')
-
-  // 追蹤保存動畫偏好
-  analytics.trackEvent(AnalyticsEvent.ANIMATION_PREFERENCE_SAVED, {
-    animationType: selectedAnimation.value
-  })
 }
 
 const animationOptions = [
@@ -539,14 +534,8 @@ async function toggleWinnerStatus(id: string) {
       const newStatus = !ticket.isWinner
       if (newStatus) {
         store.markAsWinner(id)
-        analytics.trackEvent(AnalyticsEvent.WINNER_MARKED, {
-          ticketNumber: ticket.number
-        })
       } else {
         store.removeWinner(id)
-        analytics.trackEvent(AnalyticsEvent.WINNER_UNMARKED, {
-          ticketNumber: ticket.number
-        })
       }
       if (newStatus) {
         showWinningAnimation()
@@ -561,7 +550,7 @@ async function toggleWinnerStatus(id: string) {
 }
 
 // 修改動畫函數
-async function playDrawAnimation(numbers: string[]): Promise<void> {
+async function playDrawAnimation(numbers: string[]): Promise<boolean> {
   selectedNumbers.value = numbers
   
   // 如果選擇無動畫，直接顯示結果
@@ -571,7 +560,7 @@ async function playDrawAnimation(numbers: string[]): Promise<void> {
       notFound: []
     }
     showResultsDialog.value = true
-    return
+    return true
   }
 
   showAnimationDialog.value = true
@@ -595,27 +584,35 @@ async function playDrawAnimation(numbers: string[]): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 100))
     
     // 執行動畫
-    await animationRef.value?.animate(3000, 50)
+    if (isAnimating.value) { // 檢查是否已被取消
+      await animationRef.value?.animate(3000, 50)
+    }
     
-    isAnimating.value = false
-    showWinningAnimation() // 顯示中獎彩帶效果
-    
-    // 更新抽獎結果
-    lotteryResults.value = {
-      matched: numbers.map(number => ({ number, isNew: true })),
-      notFound: []
+    if (isAnimating.value) { // 如果動畫沒有被取消
+      isAnimating.value = false
+      showWinningAnimation() // 顯示中獎彩帶效果
+      
+      // 更新抽獎結果
+      lotteryResults.value = {
+        matched: numbers.map(number => ({ number, isNew: true })),
+        notFound: []
+      }
+
+      // 等待一小段時間後自動關閉動畫對話框並顯示結果
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      showAnimationDialog.value = false
+      showResultsDialog.value = true
+      return true
     }
 
-    // 等待一小段時間後自動關閉動畫對話框並顯示結果
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    showAnimationDialog.value = false
-    showResultsDialog.value = true
+    return false
 
   } catch (error) {
     console.error('動畫播放出錯:', error)
     showNotification('動畫播放出錯', 'error')
     isAnimating.value = false
     showAnimationDialog.value = false
+    return false
   }
 }
 
@@ -623,12 +620,6 @@ async function playDrawAnimation(numbers: string[]): Promise<void> {
 async function executeRandomDraw(e: Event) {
   e.preventDefault()
   if (!numberOfWinners.value || numberOfWinners.value <= 0) return
-
-  // 追蹤開始抽獎
-  analytics.trackEvent(AnalyticsEvent.DRAW_START, {
-    numberOfWinners: numberOfWinners.value,
-    animationType: selectedAnimation.value
-  })
 
   const nonWinningTickets = store.tickets.filter(t => !t.isWinner)
   if (nonWinningTickets.length === 0) {
@@ -651,27 +642,24 @@ async function executeRandomDraw(e: Event) {
   }
 
   // 執行動畫
-  await playDrawAnimation(selectedTickets.map(t => t.number))
+  const animationCompleted = await playDrawAnimation(selectedTickets.map(t => t.number))
 
-  // 標記中獎
-  for (const ticket of selectedTickets) {
-    store.markAsWinner(ticket.id)
+  // 只有在動畫完成時才標記中獎
+  if (animationCompleted) {
+    // 標記中獎
+    for (const ticket of selectedTickets) {
+      store.markAsWinner(ticket.id)
+    }
+
+    // 添加到開獎歷史
+    store.addWinningHistory({
+      timestamp: Date.now(),
+      numbers: selectedTickets.map(t => t.number).join(', ')
+    })
+
+    showDrawDialog.value = false
+    showNotification(`已抽出 ${selectedTickets.length} 個中獎號碼`, 'success')
   }
-
-  // 添加到開獎歷史
-  store.addWinningHistory({
-    timestamp: Date.now(),
-    numbers: selectedTickets.map(t => t.number).join(', ')
-  })
-
-  // 追蹤抽獎完成
-  analytics.trackEvent(AnalyticsEvent.DRAW_COMPLETE, {
-    numberOfWinners: selectedTickets.length,
-    winningNumbers: selectedTickets.map(t => t.number).join(',')
-  })
-
-  showDrawDialog.value = false
-  showNotification(`已抽出 ${selectedTickets.length} 個中獎號碼`, 'success')
 }
 
 async function checkWinningNumbers(e: Event) {
@@ -683,11 +671,6 @@ async function checkWinningNumbers(e: Event) {
       .split(/[,\n]/)
       .map(n => n.trim())
       .filter(n => n)
-
-    // 追蹤開始檢查中獎號碼
-    analytics.trackEvent(AnalyticsEvent.WINNING_NUMBERS_CHECKED, {
-      numberOfNumbers: numbers.length
-    })
 
     console.log('Processing numbers:', numbers)
     console.log('Current tickets:', store.tickets)
@@ -760,12 +743,6 @@ function confirmDelete(ticket: { id: string; number: string }) {
 function deleteTicket() {
   if (ticketToDelete.value) {
     store.removeTicket(ticketToDelete.value.id)
-    
-    // 追蹤刪除票券
-    analytics.trackEvent(AnalyticsEvent.TICKET_DELETED, {
-      ticketNumber: ticketToDelete.value.number
-    })
-    
     showNotification(`已刪除號碼：${ticketToDelete.value.number}`, 'info')
     showDeleteDialog.value = false
     ticketToDelete.value = null
@@ -774,25 +751,27 @@ function deleteTicket() {
 
 // 添加對篩選和搜索的追蹤
 watch(() => filterStatus.value, (newStatus) => {
-  analytics.trackEvent(AnalyticsEvent.TICKET_FILTERED, {
-    filterStatus: newStatus
-  })
+  // 追蹤篩選狀態
 })
 
 watch(() => searchQuery.value, (newQuery) => {
   if (newQuery.trim()) {
-    analytics.trackEvent(AnalyticsEvent.TICKET_SEARCHED, {
-      searchQuery: newQuery
-    })
+    // 追蹤搜索
   }
 })
 
 // 添加對查看歷史記錄的追蹤
 watch(() => showWinningHistoryDialog.value, (isShown) => {
   if (isShown) {
-    analytics.trackEvent(AnalyticsEvent.HISTORY_VIEWED)
+    // 追蹤查看歷史記錄
   }
 })
+
+const cancelAnimation = () => {
+  isAnimating.value = false
+  showAnimationDialog.value = false
+  showNotification('已取消抽獎', 'info')
+}
 </script>
 
 <style scoped>

@@ -1,6 +1,56 @@
 # 彩票助手 (Lottery Assistant)
 
 一個使用 Vue 3 + TypeScript + Vuetify 3 開發的彩票管理應用。
+<<<<<<< HEAD
+=======
+
+## 分支管理
+
+本專案採用多分支策略來管理不同環境的代碼：
+
+### 主要分支
+
+- `main`: 主開發分支
+  - 不包含追蹤代碼
+  - 使用一般的 GitHub 倉庫地址
+  - 用於主要功能開發和維護
+
+- `tracking`: 生產環境分支
+  - 包含 Google Analytics 追蹤代碼
+  - 包含 Cookie 同意聲明功能
+  - 使用實際部署域名
+  - 用於生產環境部署
+
+- `gh-pages`: 部署分支
+  - 只包含構建後的 `dist` 目錄內容
+  - 用於 GitHub Pages 部署
+  - 自動通過 CI/CD 更新
+
+### 開發流程
+
+1. 在 `main` 分支進行開發
+2. 完成開發後，將更改合併到 `tracking` 分支：
+   ```bash
+   git checkout tracking
+   git merge main
+   ```
+3. 在 `tracking` 分支上構建並部署：
+   ```bash
+   pnpm build
+   git add dist -f
+   git commit -m "Update dist"
+   git subtree push --prefix dist origin gh-pages
+   ```
+
+### 分支同步
+
+為確保分支間的同步，請遵循以下步驟：
+
+1. 主要開發在 `main` 分支進行
+2. 定期將 `main` 分支的更改合併到 `tracking` 分支
+3. 在 `tracking` 分支上進行構建
+4. 將構建結果推送到 `gh-pages` 分支
+>>>>>>> main
 
 ## 功能特點
 
@@ -37,6 +87,10 @@
 
 訪問 [GitHub Pages 演示](https://abab5601.github.io/choujiangzhushou/) 查看應用。
 
+## 在線演示
+
+訪問 [GitHub 倉庫](https://github.com/abab5601/choujiangzhushou) 查看專案。
+
 ## 技術棧
 
 - Vue 3
@@ -45,7 +99,10 @@
 - Vite
 - Pinia (狀態管理)
 - Vue Router
+<<<<<<< HEAD
 - Google Analytics
+=======
+>>>>>>> main
 
 ## 本地開發
 

@@ -18,6 +18,8 @@
       </v-container>
     </v-main>
 
+    <ConsentBanner />
+
     <v-footer app class="text-center d-flex flex-column">
       <div>
         <span class="text-caption">
@@ -45,6 +47,7 @@
 </template>
 
 <script setup lang="ts">
+import ConsentBanner from '@/components/ConsentBanner.vue'
 </script>
 
 <style>

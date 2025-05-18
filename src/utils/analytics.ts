@@ -19,7 +19,10 @@ export enum AnalyticsEvent {
   TICKET_SEARCHED = 'ticket_searched',
   
   // 歷史記錄
-  HISTORY_VIEWED = 'history_viewed'
+  HISTORY_VIEWED = 'history_viewed',
+
+  // 隱私相關
+  CONSENT_UPDATED = 'consent_updated'
 }
 
 // 定義事件屬性類型
@@ -35,9 +38,23 @@ declare global {
   }
 }
 
+// 定義同意設置類型
+interface ConsentSettings {
+  analytics_storage: 'granted' | 'denied'
+  ad_storage: 'granted' | 'denied'
+  ad_user_data: 'granted' | 'denied'
+  ad_personalization: 'granted' | 'denied'
+}
+
 class Analytics {
   private static instance: Analytics
   private isInitialized = false
+  private defaultConsentSettings: ConsentSettings = {
+    analytics_storage: 'denied',
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied'
+  }
 
   private constructor() {}
 
@@ -57,6 +74,15 @@ class Analytics {
 
     this.isInitialized = true
 
+    // 設置默認同意模式
+    window.dataLayer = window.dataLayer || []
+    window.gtag = function gtag() {
+      window.dataLayer.push(arguments)
+    }
+
+    // 配置同意模式
+    window.gtag('consent', 'default', this.defaultConsentSettings)
+
     // 添加 Google Analytics 腳本
     const script = document.createElement('script')
     script.async = true
@@ -64,12 +90,23 @@ class Analytics {
     document.head.appendChild(script)
 
     // 初始化 gtag
-    window.dataLayer = window.dataLayer || []
-    window.gtag = function gtag() {
-      window.dataLayer.push(arguments)
-    }
     window.gtag('js', new Date())
-    window.gtag('config', analyticsId)
+    window.gtag('config', analyticsId, {
+      'cookie_flags': 'max-age=7200;secure;samesite=none'
+    })
+  }
+
+  // 更新用戶同意設置
+  updateConsent(settings: Partial<ConsentSettings>): void {
+    if (!this.isInitialized) {
+      console.warn('Analytics not initialized')
+      return
+    }
+
+    window.gtag('consent', 'update', settings)
+    
+    // 追蹤同意更新事件
+    this.trackEvent(AnalyticsEvent.CONSENT_UPDATED, settings)
   }
 
   // 追蹤事件

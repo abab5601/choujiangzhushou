@@ -49,7 +49,7 @@
         </v-list>
 
         <h3 class="text-h6 mb-2 mt-4">版本信息</h3>
-        <p>當前版本：1.0.0</p>
+        <p>當前版本：1.1.1</p>
         <p>
           <a
             href="https://github.com/yourusername/choujiangzhushou"

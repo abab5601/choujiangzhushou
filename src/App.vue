@@ -38,7 +38,7 @@
         </span>
       </div>
       <div class="text-caption mt-1">
-        Version 1.0.0
+        Version 1.1.1
       </div>
     </v-footer>
 

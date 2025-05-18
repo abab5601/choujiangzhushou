@@ -13,7 +13,8 @@ interface MetaInfo {
 export function updateMetaInfo(meta: MetaInfo) {
   // 更新標題
   if (meta.title) {
-    document.title = `${meta.title} - 抽獎助手`;
+    // 如果是首頁，不添加後綴
+    document.title = meta.title === '首頁' ? '抽獎助手' : `${meta.title} - 抽獎助手`;
   }
 
   // 更新 meta 描述
@@ -36,7 +37,8 @@ export function updateMetaInfo(meta: MetaInfo) {
   if (meta.ogTitle) {
     const ogTitleMeta = document.querySelector('meta[property="og:title"]');
     if (ogTitleMeta) {
-      ogTitleMeta.setAttribute('content', `${meta.ogTitle} - 抽獎助手`);
+      // 如果是首頁，不添加後綴
+      ogTitleMeta.setAttribute('content', meta.ogTitle === '首頁' ? '抽獎助手' : `${meta.ogTitle} - 抽獎助手`);
     }
   }
 
@@ -58,7 +60,8 @@ export function updateMetaInfo(meta: MetaInfo) {
   if (meta.twitterTitle) {
     const twitterTitleMeta = document.querySelector('meta[name="twitter:title"]');
     if (twitterTitleMeta) {
-      twitterTitleMeta.setAttribute('content', `${meta.twitterTitle} - 抽獎助手`);
+      // 如果是首頁，不添加後綴
+      twitterTitleMeta.setAttribute('content', meta.twitterTitle === '首頁' ? '抽獎助手' : `${meta.twitterTitle} - 抽獎助手`);
     }
   }
 

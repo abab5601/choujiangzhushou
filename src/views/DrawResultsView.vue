@@ -353,7 +353,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, shallowRef, watch } from 'vue'
-import { useLotteryStore, type WinningHistoryEntry } from '@/stores/lottery'
+import { useLotteryStore } from '@/stores/lottery'
 import confetti from 'canvas-confetti'
 import { updateMetaInfo } from '@/utils/seo'
 import SlotMachineAnimation from '@/components/animations/SlotMachineAnimation.vue'

@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 const props = defineProps<{
   winningNumbers: string[]
@@ -22,11 +22,6 @@ const props = defineProps<{
 }>()
 
 const displayNumbers = ref<string[]>([])
-
-// 計算容器寬度
-const containerWidth = computed(() => {
-  return props.winningNumbers.length * 90 // 每個數字格子80px + 10px間距
-})
 
 // 初始化顯示數字
 onMounted(() => {

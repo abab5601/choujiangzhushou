@@ -54,6 +54,22 @@
     
     <!-- Manifest -->
     <link rel="manifest" href="/manifest.json">
+    <script type="text/javascript">
+      // 單頁應用的 GitHub Pages 重定向
+      (function(){
+        var l = window.location;
+        var path = l.pathname.replace(/^\/choujiangzhushou/, '');
+        if (path === '/404.html') {
+          path = window.sessionStorage.getItem('redirect') || '/';
+        } else {
+          window.sessionStorage.setItem('redirect', path);
+        }
+        l.replace(
+          l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+          '/choujiangzhushou' + path + (l.search || '') + (l.hash || '')
+        );
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>

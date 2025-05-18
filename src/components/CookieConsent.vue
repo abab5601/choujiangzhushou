@@ -87,6 +87,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+// Declare gtag for TypeScript
+declare const gtag: (...args: any[]) => void
+
 const showDialog = ref(false)
 const showCustomDialog = ref(false)
 const settings = ref({
@@ -119,25 +122,43 @@ onMounted(() => {
 
 // 更新 Google Analytics 的同意設置
 function updateConsent(analytics: boolean, ads: boolean, personalization: boolean) {
-  // @ts-ignore
-  gtag('consent', 'update', {
-    'analytics_storage': analytics ? 'granted' : 'denied',
-    'ad_storage': ads ? 'granted' : 'denied',
-    'ad_user_data': ads ? 'granted' : 'denied',
-    'ad_personalization': personalization ? 'granted' : 'denied'
-  })
+  try {
+    // Check if gtag is available
+    if (typeof gtag !== 'function') {
+      console.error('Google Analytics not loaded')
+      return
+    }
 
-  // 如果全部拒絕，則不保存到 localStorage，這樣下次訪問時會再次詢問
-  if (!analytics && !ads && !personalization) {
-    localStorage.removeItem('cookieConsent')
-  } else {
-    // 保存設置到 localStorage
-    localStorage.setItem('cookieConsent', JSON.stringify({
-      analytics_storage: analytics ? 'granted' : 'denied',
-      ad_storage: ads ? 'granted' : 'denied',
-      ad_user_data: ads ? 'granted' : 'denied',
-      ad_personalization: personalization ? 'granted' : 'denied'
-    }))
+    // Update consent settings
+    gtag('consent', 'update', {
+      'analytics_storage': analytics ? 'granted' : 'denied',
+      'ad_storage': ads ? 'granted' : 'denied',
+      'ad_user_data': ads ? 'granted' : 'denied',
+      'ad_personalization': personalization ? 'granted' : 'denied'
+    })
+
+    // Track consent update event
+    gtag('event', 'consent_update', {
+      'analytics_consent': analytics,
+      'ads_consent': ads,
+      'personalization_consent': personalization
+    })
+
+    // Handle localStorage
+    if (!analytics && !ads && !personalization) {
+      localStorage.removeItem('cookieConsent')
+    } else {
+      localStorage.setItem('cookieConsent', JSON.stringify({
+        analytics_storage: analytics ? 'granted' : 'denied',
+        ad_storage: ads ? 'granted' : 'denied',
+        ad_user_data: ads ? 'granted' : 'denied',
+        ad_personalization: personalization ? 'granted' : 'denied',
+        timestamp: new Date().toISOString()
+      }))
+    }
+  } catch (error) {
+    console.error('Error updating consent settings:', error)
+    // You might want to show a notification to the user here
   }
 }
 

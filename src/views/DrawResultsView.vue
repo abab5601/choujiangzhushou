@@ -368,6 +368,7 @@ import { updateMetaInfo } from '@/utils/seo'
 import SlotMachineAnimation from '@/components/animations/SlotMachineAnimation.vue'
 import CardAnimation from '@/components/animations/CardAnimation.vue'
 import BoxAnimation from '@/components/animations/BoxAnimation.vue'
+import { trackInteraction, trackError } from '../utils/analytics'
 
 const store = useLotteryStore()
 
@@ -624,13 +625,18 @@ async function executeRandomDraw(e: Event) {
   const nonWinningTickets = store.tickets.filter(t => !t.isWinner)
   if (nonWinningTickets.length === 0) {
     showNotification('沒有可抽取的號碼', 'warning')
+    trackInteraction('draw_failed', 'Lottery', 'No available tickets')
     return
   }
 
   if (numberOfWinners.value > nonWinningTickets.length) {
     showNotification(`只剩下 ${nonWinningTickets.length} 個可抽取的號碼`, 'warning')
+    trackInteraction('draw_failed', 'Lottery', 'Not enough tickets')
     return
   }
+
+  // Track draw start
+  trackInteraction('draw_start', 'Lottery', `Drawing ${numberOfWinners.value} tickets`)
 
   // 隨機選擇中獎號碼
   const selectedTickets = []
@@ -646,6 +652,7 @@ async function executeRandomDraw(e: Event) {
 
   // 只有在動畫完成時才標記中獎
   if (animationCompleted) {
+    trackInteraction('draw_complete', 'Lottery', `Drew ${selectedTickets.length} tickets`)
     // 標記中獎
     for (const ticket of selectedTickets) {
       store.markAsWinner(ticket.id)
@@ -671,6 +678,8 @@ async function checkWinningNumbers(e: Event) {
       .split(/[,\n]/)
       .map(n => n.trim())
       .filter(n => n)
+
+    trackInteraction('check_numbers_start', 'Lottery', `Checking ${numbers.length} numbers`)
 
     console.log('Processing numbers:', numbers)
     console.log('Current tickets:', store.tickets)
@@ -700,6 +709,7 @@ async function checkWinningNumbers(e: Event) {
     winningNumbers.value = ''  // 清空輸入
     
     if (winCount > 0) {
+      trackInteraction('check_numbers_complete', 'Lottery', `Found ${winCount} winning tickets`)
       console.log(`Found ${winCount} winning tickets`)
       snackbarText.value = `找到 ${winCount} 個中獎號碼`
       snackbarColor.value = 'success'
@@ -708,6 +718,7 @@ async function checkWinningNumbers(e: Event) {
       // 觸發彩帶效果
       showWinningAnimation()
     } else {
+      trackInteraction('check_numbers_complete', 'Lottery', 'No winning tickets found')
       console.log('No winning tickets found')
       snackbarText.value = '沒有找到中獎號碼'
       snackbarColor.value = 'info'
@@ -715,6 +726,7 @@ async function checkWinningNumbers(e: Event) {
       showResultsDialog.value = true  // 仍然顯示結果對話框
     }
   } catch (error) {
+    trackError(error as Error, 'check_winning_numbers')
     console.error('處理中獎號碼時出錯:', error)
     console.error('Error details:', {
       error,
@@ -750,7 +762,7 @@ function deleteTicket() {
 }
 
 // 添加對篩選和搜索的追蹤
-watch(() => filterStatus.value, (newStatus) => {
+watch(() => filterStatus.value, () => {
   // 追蹤篩選狀態
 })
 

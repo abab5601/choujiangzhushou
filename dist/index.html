@@ -2,15 +2,27 @@
 <html lang="zh-TW">
   <head>
     <meta charset="UTF-8">
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5CCCNZXFE4"></script>
+    <!-- Google tag (gtag.js) -->
     <script>
+      // 定義默認的同意設置
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+      
+      // 設置默認同意模式 - 必須在載入 gtag.js 之前設置
+      gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'wait_for_update': 500
+      });
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5CCCNZXFE4"></script>
+    <script>
       gtag('js', new Date());
       gtag('config', 'G-5CCCNZXFE4');
     </script>
-    
+
     <!-- Favicon and Icons -->
     <link rel="icon" type="image/x-icon" href="/choujiangzhushou/favicon.ico">
     <link rel="icon" type="image/png" href="/choujiangzhushou/icons/icon-192x192.png" sizes="192x192">
@@ -63,10 +75,10 @@
     
     <!-- Manifest -->
     <link rel="manifest" href="/choujiangzhushou/manifest.json">
-    <script type="module" crossorigin src="/choujiangzhushou/assets/index-jED0N2iW.js"></script>
-    <link rel="stylesheet" crossorigin href="/choujiangzhushou/assets/index-CHkLIQxC.css">
+    <script type="module" crossorigin src="/choujiangzhushou/assets/index-B9uqS5Ef.js"></script>
+    <link rel="stylesheet" crossorigin href="/choujiangzhushou/assets/index-DjHOAEl2.css">
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app"></div>
   </body>
 </html> 

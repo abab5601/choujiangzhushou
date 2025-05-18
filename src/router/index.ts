@@ -4,6 +4,7 @@ import TicketInputView from '../views/TicketInputView.vue'
 import DrawResultsView from '../views/DrawResultsView.vue'
 import HistoryView from '../views/HistoryView.vue'
 import AboutView from '../views/AboutView.vue'
+import { trackPageView } from '@/utils/analytics'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -34,6 +35,13 @@ const router = createRouter({
       component: AboutView
     }
   ]
+})
+
+// Add navigation tracking
+router.afterEach((to) => {
+  // Get the page title from the route meta
+  const pageTitle = to.name?.toString() || 'Unknown Page'
+  trackPageView(to.fullPath, pageTitle)
 })
 
 export default router 

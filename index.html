@@ -1,88 +1,108 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-  <head>
-    <meta charset="UTF-8">
-    <!-- Google tag (gtag.js) -->
-    <script>
-      // 定義默認的同意設置
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      
-      // 設置默認同意模式 - 必須在載入 gtag.js 之前設置
-      gtag('consent', 'default', {
-        'analytics_storage': 'denied',
-        'ad_storage': 'denied',
-        'ad_user_data': 'denied',
-        'ad_personalization': 'denied',
-        'wait_for_update': 500
-      });
-    </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5CCCNZXFE4"></script>
-    <script>
-      gtag('js', new Date());
-      gtag('config', 'G-5CCCNZXFE4');
-    </script>
 
-    <!-- Favicon and Icons -->
-    <link rel="icon" type="image/x-icon" href="/choujiangzhushou/favicon.ico">
-    <link rel="icon" type="image/png" href="/choujiangzhushou/icons/icon-192x192.png" sizes="192x192">
-    <link rel="icon" type="image/png" href="/choujiangzhushou/icons/icon-512x512.png" sizes="512x512">
-    <link rel="apple-touch-icon" href="/choujiangzhushou/icons/icon-192x192.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>抽獎助手 - 多功能抽獎工具｜活動抽獎｜課堂點名｜獎項管理</title>
-    
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="抽獎助手是一款全能的抽獎工具，適用於各種場景：活動抽獎、課堂隨機點名、公司年會抽獎、粉絲互動抽獎、尾牙摸彩、線上直播抽獎等。提供公平公正的隨機抽獎、獎項管理、中獎記錄等功能。">
-    <meta name="keywords" content="抽獎助手,活動抽獎,課堂點名,年會抽獎,摸彩遊戲,線上抽獎,直播抽獎,抽獎工具,獎項管理,抽獎記錄,公平抽獎,隨機抽選,尾牙抽獎,粉絲抽獎,抽獎系統">
-    <meta name="author" content="抽獎助手開發團隊">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="抽獎助手 - 多功能抽獎工具｜活動抽獎｜課堂點名｜獎項管理">
-    <meta property="og:description" content="一款適用於各種場景的抽獎工具：活動抽獎、課堂點名、公司年會、粉絲互動、尾牙摸彩、直播抽獎等。提供公平公正的隨機抽獎功能，支持獎項管理和歷史記錄。">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://abab5601.github.io/choujiangzhushou/">
-    <meta property="og:image" content="https://abab5601.github.io/choujiangzhushou/og-image.jpg">
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="抽獎助手 - 多功能抽獎工具｜活動抽獎｜課堂點名｜獎項管理">
-    <meta name="twitter:description" content="一款適用於各種場景的抽獎工具：活動抽獎、課堂點名、公司年會、粉絲互動、尾牙摸彩、直播抽獎等。提供公平公正的隨機抽獎功能，支持獎項管理和歷史記錄。">
-    <meta name="twitter:image" content="https://abab5601.github.io/choujiangzhushou/twitter-image.jpg">
-    
-    <!-- Mobile App Meta Tags -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="抽獎助手">
-    
-    <!-- PWA Meta Tags -->
-    <meta name="application-name" content="抽獎助手">
-    <meta name="theme-color" content="#1976D2">
-    <meta name="msapplication-navbutton-color" content="#1976D2">
-    <meta name="msapplication-TileColor" content="#1976D2">
-    <meta name="msapplication-starturl" content="/choujiangzhushou/">
-    
-    <!-- Additional Meta Tags for Specific Use Cases -->
-    <meta name="subject" content="抽獎工具,活動抽獎,課堂點名">
-    <meta name="rating" content="General">
-    <meta name="language" content="zh-TW">
-    
-    <!-- Robots Meta Tag -->
-    <meta name="robots" content="index, follow">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://abab5601.github.io/choujiangzhushou/">
-    
-    <!-- Sitemap -->
-    <link rel="sitemap" type="application/xml" href="/choujiangzhushou/sitemap.xml">
-    
-    <!-- Manifest -->
-    <link rel="manifest" href="/choujiangzhushou/manifest.json">
-    <script type="module" crossorigin src="/choujiangzhushou/assets/index-BpZTwwx3.js"></script>
-    <link rel="modulepreload" crossorigin href="/choujiangzhushou/assets/vendor-DnUuU-kZ.js">
-    <link rel="stylesheet" crossorigin href="/choujiangzhushou/assets/index-CYeNtYlS.css">
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
-</html> 
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script>
+    // 定義默認的同意設置
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+
+    // 設置默認同意模式 - 必須在載入 gtag.js 之前設置
+    gtag('consent', 'default', {
+      'analytics_storage': 'denied',
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5CCCNZXFE4"></script>
+  <script>
+    gtag('js', new Date());
+    gtag('config', 'G-5CCCNZXFE4');
+  </script>
+  <script type="text/javascript">
+    (function (l) {
+      if (l.search[1] === "/") {
+        var decoded = l.search
+          .slice(1)
+          .split("&")
+          .map(function (s) {
+            return s.replace(/~and~/g, "&");
+          })
+          .join("?");
+        window.history.replaceState(
+          null,
+          null,
+          l.pathname.slice(0, -1) + decoded + l.hash
+        );
+      }
+    })(window.location);
+  </script>
+  <!-- Favicon and Icons -->
+  <link rel="icon" type="image/x-icon" href="/choujiangzhushou/favicon.ico">
+  <link rel="icon" type="image/png" href="/choujiangzhushou/icons/icon-192x192.png" sizes="192x192">
+  <link rel="icon" type="image/png" href="/choujiangzhushou/icons/icon-512x512.png" sizes="512x512">
+  <link rel="apple-touch-icon" href="/choujiangzhushou/icons/icon-192x192.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>抽獎助手 - 多功能抽獎工具｜活動抽獎｜課堂點名｜獎項管理</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="抽獎助手是一款全能的抽獎工具，適用於各種場景：活動抽獎、課堂隨機點名、公司年會抽獎、粉絲互動抽獎、尾牙摸彩、線上直播抽獎等。提供公平公正的隨機抽獎、獎項管理、中獎記錄等功能。">
+  <meta name="keywords" content="抽獎助手,活動抽獎,課堂點名,年會抽獎,摸彩遊戲,線上抽獎,直播抽獎,抽獎工具,獎項管理,抽獎記錄,公平抽獎,隨機抽選,尾牙抽獎,粉絲抽獎,抽獎系統">
+  <meta name="author" content="抽獎助手開發團隊">
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="抽獎助手 - 多功能抽獎工具｜活動抽獎｜課堂點名｜獎項管理">
+  <meta property="og:description" content="一款適用於各種場景的抽獎工具：活動抽獎、課堂點名、公司年會、粉絲互動、尾牙摸彩、直播抽獎等。提供公平公正的隨機抽獎功能，支持獎項管理和歷史記錄。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://abab5601.github.io/choujiangzhushou/">
+  <meta property="og:image" content="https://abab5601.github.io/choujiangzhushou/og-image.jpg">
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="抽獎助手 - 多功能抽獎工具｜活動抽獎｜課堂點名｜獎項管理">
+  <meta name="twitter:description" content="一款適用於各種場景的抽獎工具：活動抽獎、課堂點名、公司年會、粉絲互動、尾牙摸彩、直播抽獎等。提供公平公正的隨機抽獎功能，支持獎項管理和歷史記錄。">
+  <meta name="twitter:image" content="https://abab5601.github.io/choujiangzhushou/twitter-image.jpg">
+
+  <!-- Mobile App Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="抽獎助手">
+
+  <!-- PWA Meta Tags -->
+  <meta name="application-name" content="抽獎助手">
+  <meta name="theme-color" content="#1976D2">
+  <meta name="msapplication-navbutton-color" content="#1976D2">
+  <meta name="msapplication-TileColor" content="#1976D2">
+  <meta name="msapplication-starturl" content="/choujiangzhushou/">
+
+  <!-- Additional Meta Tags for Specific Use Cases -->
+  <meta name="subject" content="抽獎工具,活動抽獎,課堂點名">
+  <meta name="rating" content="General">
+  <meta name="language" content="zh-TW">
+
+  <!-- Robots Meta Tag -->
+  <meta name="robots" content="index, follow">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://abab5601.github.io/choujiangzhushou/">
+
+  <!-- Sitemap -->
+  <link rel="sitemap" type="application/xml" href="/choujiangzhushou/sitemap.xml">
+
+  <!-- Manifest -->
+  <link rel="manifest" href="/choujiangzhushou/manifest.json">
+  <script type="module" crossorigin src="/choujiangzhushou/assets/index-BpZTwwx3.js"></script>
+  <link rel="modulepreload" crossorigin href="/choujiangzhushou/assets/vendor-DnUuU-kZ.js">
+  <link rel="stylesheet" crossorigin href="/choujiangzhushou/assets/index-CYeNtYlS.css">
+</head>
+
+<body>
+  <div id="app"></div>
+</body>
+
+</html>

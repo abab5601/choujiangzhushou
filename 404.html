@@ -1,119 +1,133 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-  <head>
-    <meta charset="UTF-8">
-    <!-- Favicon and Icons -->
-    <link rel="icon" href="/favicon.ico" sizes="64x64">
-    <link rel="icon" type="image/png" href="/icons/icon-192x192.png" sizes="192x192">
-    <link rel="icon" type="image/png" href="/icons/icon-512x512.png" sizes="512x512">
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>抽獎助手 - 重定向中...</title>
-    
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="抽獎助手是一款全能的抽獎工具，適用於各種場景：活動抽獎、課堂隨機點名、公司年會抽獎、粉絲互動抽獎、尾牙摸彩、線上直播抽獎等。提供公平公正的隨機抽獎、獎項管理、中獎記錄等功能。">
-    <meta name="keywords" content="抽獎助手,活動抽獎,課堂點名,年會抽獎,摸彩遊戲,線上抽獎,直播抽獎,抽獎工具,獎項管理,抽獎記錄,公平抽獎,隨機抽選,尾牙抽獎,粉絲抽獎,抽獎系統">
-    <meta name="author" content="抽獎助手開發團隊">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="抽獎助手 - 多功能抽獎工具｜活動抽獎｜課堂點名｜獎項管理">
-    <meta property="og:description" content="一款適用於各種場景的抽獎工具：活動抽獎、課堂點名、公司年會、粉絲互動、尾牙摸彩、直播抽獎等。提供公平公正的隨機抽獎功能，支持獎項管理和歷史記錄。">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://your-domain.com">
-    <meta property="og:image" content="https://your-domain.com/og-image.jpg">
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="抽獎助手 - 多功能抽獎工具｜活動抽獎｜課堂點名｜獎項管理">
-    <meta name="twitter:description" content="一款適用於各種場景的抽獎工具：活動抽獎、課堂點名、公司年會、粉絲互動、尾牙摸彩、直播抽獎等。提供公平公正的隨機抽獎功能，支持獎項管理和歷史記錄。">
-    <meta name="twitter:image" content="https://your-domain.com/twitter-image.jpg">
-    
-    <!-- Mobile App Meta Tags -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="抽獎助手">
-    
-    <!-- PWA Meta Tags -->
-    <meta name="application-name" content="抽獎助手">
-    <meta name="theme-color" content="#1976D2">
-    <meta name="msapplication-navbutton-color" content="#1976D2">
-    <meta name="msapplication-TileColor" content="#1976D2">
-    <meta name="msapplication-starturl" content="/">
-    
-    <!-- Additional Meta Tags for Specific Use Cases -->
-    <meta name="subject" content="抽獎工具,活動抽獎,課堂點名">
-    <meta name="rating" content="General">
-    <meta name="language" content="zh-TW">
-    
-    <!-- Robots Meta Tag -->
-    <meta name="robots" content="index, follow">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://your-domain.com">
-    
-    <!-- Manifest -->
-    <link rel="manifest" href="/manifest.json">
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f5f5f5;
-        }
-        .loading {
-            text-align: center;
-            padding: 20px;
-        }
-        .loading p {
-            margin: 10px 0;
-            color: #666;
-        }
-        .spinner {
-            width: 40px;
-            height: 40px;
-            margin: 20px auto;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #1976D2;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-    <script>
-        // GitHub Pages SPA 重定向
-        (function() {
-            const segments = window.location.pathname.split('/');
-            const repoName = 'choujiangzhushou';
-            
-            // 如果是在 404 頁面
-            if (segments.includes('404.html')) {
-                // 從 sessionStorage 獲取保存的路徑
-                const savedPath = sessionStorage.getItem('path');
-                if (savedPath) {
-                    window.location.replace(savedPath);
-                } else {
-                    // 如果沒有保存的路徑，返回首頁
-                    window.location.replace('/choujiangzhushou/');
-                }
-            } else {
-                // 不是 404 頁面，保存當前路徑
-                const fullPath = window.location.href;
-                sessionStorage.setItem('path', fullPath);
-            }
-        })();
-    </script>
-  </head>
-  <body>
-    <div class="loading">
-        <div class="spinner"></div>
-        <p>重定向中，請稍候...</p>
-    </div>
-  </body>
-</html> 
+
+<head>
+  <meta charset="UTF-8">
+  <!-- Favicon and Icons -->
+  <link rel="icon" href="/favicon.ico" sizes="64x64">
+  <link rel="icon" type="image/png" href="/icons/icon-192x192.png" sizes="192x192">
+  <link rel="icon" type="image/png" href="/icons/icon-512x512.png" sizes="512x512">
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>抽獎助手 - 重定向中...</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="抽獎助手是一款全能的抽獎工具，適用於各種場景：活動抽獎、課堂隨機點名、公司年會抽獎、粉絲互動抽獎、尾牙摸彩、線上直播抽獎等。提供公平公正的隨機抽獎、獎項管理、中獎記錄等功能。">
+  <meta name="keywords" content="抽獎助手,活動抽獎,課堂點名,年會抽獎,摸彩遊戲,線上抽獎,直播抽獎,抽獎工具,獎項管理,抽獎記錄,公平抽獎,隨機抽選,尾牙抽獎,粉絲抽獎,抽獎系統">
+  <meta name="author" content="抽獎助手開發團隊">
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="抽獎助手 - 多功能抽獎工具｜活動抽獎｜課堂點名｜獎項管理">
+  <meta property="og:description" content="一款適用於各種場景的抽獎工具：活動抽獎、課堂點名、公司年會、粉絲互動、尾牙摸彩、直播抽獎等。提供公平公正的隨機抽獎功能，支持獎項管理和歷史記錄。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://your-domain.com">
+  <meta property="og:image" content="https://your-domain.com/og-image.jpg">
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="抽獎助手 - 多功能抽獎工具｜活動抽獎｜課堂點名｜獎項管理">
+  <meta name="twitter:description" content="一款適用於各種場景的抽獎工具：活動抽獎、課堂點名、公司年會、粉絲互動、尾牙摸彩、直播抽獎等。提供公平公正的隨機抽獎功能，支持獎項管理和歷史記錄。">
+  <meta name="twitter:image" content="https://your-domain.com/twitter-image.jpg">
+
+  <!-- Mobile App Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="抽獎助手">
+
+  <!-- PWA Meta Tags -->
+  <meta name="application-name" content="抽獎助手">
+  <meta name="theme-color" content="#1976D2">
+  <meta name="msapplication-navbutton-color" content="#1976D2">
+  <meta name="msapplication-TileColor" content="#1976D2">
+  <meta name="msapplication-starturl" content="/">
+
+  <!-- Additional Meta Tags for Specific Use Cases -->
+  <meta name="subject" content="抽獎工具,活動抽獎,課堂點名">
+  <meta name="rating" content="General">
+  <meta name="language" content="zh-TW">
+
+  <!-- Robots Meta Tag -->
+  <meta name="robots" content="index, follow">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://your-domain.com">
+
+  <!-- Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .loading p {
+      margin: 10px 0;
+      color: #666;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      margin: 20px auto;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #1976D2;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+  <script>
+    // GitHub Pages SPA 重定向
+    var pathSegmentsToKeep = 1;
+
+    var l = window.location;
+    l.replace(
+      l.protocol +
+      "//" +
+      l.hostname +
+      (l.port ? ":" + l.port : "") +
+      l.pathname
+        .split("/")
+        .slice(0, 1 + pathSegmentsToKeep)
+        .join("/") +
+      "/?/" +
+      l.pathname
+        .slice(1)
+        .split("/")
+        .slice(pathSegmentsToKeep)
+        .join("/")
+        .replace(/&/g, "~and~") +
+      (l.search ? "&" + l.search.slice(1).replace(/&/g, "~and~") : "") +
+      l.hash
+    );
+  </script>
+</head>
+
+<body>
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>重定向中，請稍候...</p>
+  </div>
+</body>
+
+</html>

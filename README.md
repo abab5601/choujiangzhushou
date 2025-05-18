@@ -1,8 +1,53 @@
-# 彩票助手
+# 彩票助手 (Lottery Assistant)
 
-一個使用 Vue 3 + TypeScript + Vuetify 開發的彩票管理應用程序。
+一個使用 Vue 3 + TypeScript + Vuetify 3 開發的彩票管理應用。
 
-> 📢 特別說明：本項目完全由 Anthropic 公司的 AI 助手 Claude 設計和開發。從需求分析、架構設計、代碼實現到問題修復，均由 Claude 完成。這是一個展示 AI 輔助開發能力的實際案例。
+## 分支管理
+
+本專案採用多分支策略來管理不同環境的代碼：
+
+### 主要分支
+
+- `main`: 主開發分支
+  - 不包含追蹤代碼
+  - 使用一般的 GitHub 倉庫地址
+  - 用於主要功能開發和維護
+
+- `tracking`: 生產環境分支
+  - 包含 Google Analytics 追蹤代碼
+  - 包含 Cookie 同意聲明功能
+  - 使用實際部署域名
+  - 用於生產環境部署
+
+- `gh-pages`: 部署分支
+  - 只包含構建後的 `dist` 目錄內容
+  - 用於 GitHub Pages 部署
+  - 自動通過 CI/CD 更新
+
+### 開發流程
+
+1. 在 `main` 分支進行開發
+2. 完成開發後，將更改合併到 `tracking` 分支：
+   ```bash
+   git checkout tracking
+   git merge main
+   ```
+3. 在 `tracking` 分支上構建並部署：
+   ```bash
+   pnpm build
+   git add dist -f
+   git commit -m "Update dist"
+   git subtree push --prefix dist origin gh-pages
+   ```
+
+### 分支同步
+
+為確保分支間的同步，請遵循以下步驟：
+
+1. 主要開發在 `main` 分支進行
+2. 定期將 `main` 分支的更改合併到 `tracking` 分支
+3. 在 `tracking` 分支上進行構建
+4. 將構建結果推送到 `gh-pages` 分支
 
 ## 功能特點
 
@@ -31,72 +76,69 @@
   - 本地數據持久化
   - 數據導入導出功能
 
+## 在線演示
+
+訪問 [GitHub 倉庫](https://github.com/abab5601/choujiangzhushou) 查看專案。
+
 ## 技術棧
 
 - Vue 3
 - TypeScript
 - Vuetify 3
-- Pinia
 - Vite
+- Pinia (狀態管理)
+- Vue Router
 
-## 開發環境要求
+## 本地開發
 
-- Node.js >= 18.0.0
-- npm >= 9.0.0
+### 環境要求
 
-## 安裝和運行
+- Node.js (推薦 v18 或更高版本)
+- pnpm (v8.6.12 或更高版本)
 
-1. 克隆倉庫
+### 安裝依賴
+
 ```bash
-git clone [repository-url]
-cd choujiangzhushou
+pnpm install
 ```
 
-2. 安裝依賴
+### 開發模式
+
 ```bash
-npm install
+pnpm dev
 ```
 
-3. 運行開發服務器
+### 構建生產版本
+
 ```bash
-npm run dev
+pnpm build
 ```
 
-4. 構建生產版本
+### 預覽生產版本
+
 ```bash
-npm run build
+pnpm preview
 ```
 
-## 使用說明
+## 部署
 
-1. 添加彩票
-   - 在"輸入號碼"頁面選擇輸入方式
-   - 支持單張、批量和範圍輸入
-   - 實時顯示輸入數量
+本項目使用 GitHub Pages 進行部署。當推送到 `gh-pages` 分支時，會自動觸發部署流程。
 
-2. 開獎功能
-   - 在"開獎結果"頁面進行開獎操作
-   - 支持手動輸入中獎號碼
-   - 支持隨機抽獎功能
-   - 提供多種動畫效果選擇：
-     - 老虎機效果：多個數字同時滾動
-     - 翻牌效果：逐個翻開揭曉
-     - 抽獎箱效果：禮物盒搖動開獎
-     - 無動畫：直接顯示結果
-   - 可以記住喜歡的動畫效果
+### 手動部署步驟
 
-3. 查看記錄
-   - 在"歷史記錄"頁面查看所有彩票
-   - 查看開獎歷史
-   - 導出數據備份
+1. 構建生產版本：
+```bash
+pnpm build
+```
 
-## 開發說明
+2. 將 dist 目錄推送到 gh-pages 分支：
+```bash
+git add dist -f
+git commit -m "Add dist for GitHub Pages"
+git subtree push --prefix dist origin gh-pages
+```
 
-本項目完全由 Claude（Anthropic 公司開發的 AI 助手）負責開發：
-- 完整的應用架構設計
-- 全部代碼的生成和實現
-- 功能優化和問題修復
-- 文檔編寫和維護
+## 開發者
 
 開發過程中的主要工作：
 - 需求分析和功能設計

@@ -346,6 +346,15 @@
             </div>
           </div>
         </v-card-text>
+        <v-card-actions v-if="isAnimating">
+          <v-spacer></v-spacer>
+          <v-btn
+            color="error"
+            @click="cancelAnimation"
+          >
+            取消抽獎
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -541,7 +550,7 @@ async function toggleWinnerStatus(id: string) {
 }
 
 // 修改動畫函數
-async function playDrawAnimation(numbers: string[]): Promise<void> {
+async function playDrawAnimation(numbers: string[]): Promise<boolean> {
   selectedNumbers.value = numbers
   
   // 如果選擇無動畫，直接顯示結果
@@ -551,7 +560,7 @@ async function playDrawAnimation(numbers: string[]): Promise<void> {
       notFound: []
     }
     showResultsDialog.value = true
-    return
+    return true
   }
 
   showAnimationDialog.value = true
@@ -575,27 +584,35 @@ async function playDrawAnimation(numbers: string[]): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 100))
     
     // 執行動畫
-    await animationRef.value?.animate(3000, 50)
+    if (isAnimating.value) { // 檢查是否已被取消
+      await animationRef.value?.animate(3000, 50)
+    }
     
-    isAnimating.value = false
-    showWinningAnimation() // 顯示中獎彩帶效果
-    
-    // 更新抽獎結果
-    lotteryResults.value = {
-      matched: numbers.map(number => ({ number, isNew: true })),
-      notFound: []
+    if (isAnimating.value) { // 如果動畫沒有被取消
+      isAnimating.value = false
+      showWinningAnimation() // 顯示中獎彩帶效果
+      
+      // 更新抽獎結果
+      lotteryResults.value = {
+        matched: numbers.map(number => ({ number, isNew: true })),
+        notFound: []
+      }
+
+      // 等待一小段時間後自動關閉動畫對話框並顯示結果
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      showAnimationDialog.value = false
+      showResultsDialog.value = true
+      return true
     }
 
-    // 等待一小段時間後自動關閉動畫對話框並顯示結果
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    showAnimationDialog.value = false
-    showResultsDialog.value = true
+    return false
 
   } catch (error) {
     console.error('動畫播放出錯:', error)
     showNotification('動畫播放出錯', 'error')
     isAnimating.value = false
     showAnimationDialog.value = false
+    return false
   }
 }
 
@@ -625,21 +642,24 @@ async function executeRandomDraw(e: Event) {
   }
 
   // 執行動畫
-  await playDrawAnimation(selectedTickets.map(t => t.number))
+  const animationCompleted = await playDrawAnimation(selectedTickets.map(t => t.number))
 
-  // 標記中獎
-  for (const ticket of selectedTickets) {
-    store.markAsWinner(ticket.id)
+  // 只有在動畫完成時才標記中獎
+  if (animationCompleted) {
+    // 標記中獎
+    for (const ticket of selectedTickets) {
+      store.markAsWinner(ticket.id)
+    }
+
+    // 添加到開獎歷史
+    store.addWinningHistory({
+      timestamp: Date.now(),
+      numbers: selectedTickets.map(t => t.number).join(', ')
+    })
+
+    showDrawDialog.value = false
+    showNotification(`已抽出 ${selectedTickets.length} 個中獎號碼`, 'success')
   }
-
-  // 添加到開獎歷史
-  store.addWinningHistory({
-    timestamp: Date.now(),
-    numbers: selectedTickets.map(t => t.number).join(', ')
-  })
-
-  showDrawDialog.value = false
-  showNotification(`已抽出 ${selectedTickets.length} 個中獎號碼`, 'success')
 }
 
 async function checkWinningNumbers(e: Event) {
@@ -746,6 +766,12 @@ watch(() => showWinningHistoryDialog.value, (isShown) => {
     // 追蹤查看歷史記錄
   }
 })
+
+const cancelAnimation = () => {
+  isAnimating.value = false
+  showAnimationDialog.value = false
+  showNotification('已取消抽獎', 'info')
+}
 </script>
 
 <style scoped>

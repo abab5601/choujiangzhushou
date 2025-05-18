@@ -31,14 +31,41 @@ watch(() => props.winningNumbers, (newNumbers) => {
   cardStates.value = Array(newNumbers.length).fill(false)
 }, { immediate: true })
 
+// 監聽動畫狀態
+watch(() => props.isAnimating, (isAnimating) => {
+  if (!isAnimating) {
+    // 清空顯示的號碼並重置卡片狀態
+    displayNumbers.value = Array(props.winningNumbers.length).fill('')
+    cardStates.value = Array(props.winningNumbers.length).fill(false)
+  }
+})
+
 async function animate(duration: number): Promise<void> {
   const delayPerCard = duration / props.winningNumbers.length
 
   for (let i = 0; i < props.winningNumbers.length; i++) {
+    if (!props.isAnimating) {
+      // 清空顯示的號碼並重置卡片狀態
+      displayNumbers.value = Array(props.winningNumbers.length).fill('')
+      cardStates.value = Array(props.winningNumbers.length).fill(false)
+      break
+    }
     displayNumbers.value[i] = props.winningNumbers[i]
     await new Promise(resolve => setTimeout(resolve, delayPerCard / 2))
+    if (!props.isAnimating) {
+      // 清空顯示的號碼並重置卡片狀態
+      displayNumbers.value = Array(props.winningNumbers.length).fill('')
+      cardStates.value = Array(props.winningNumbers.length).fill(false)
+      break
+    }
     cardStates.value[i] = true
     await new Promise(resolve => setTimeout(resolve, delayPerCard / 2))
+  }
+
+  if (!props.isAnimating) {
+    // 清空顯示的號碼並重置卡片狀態
+    displayNumbers.value = Array(props.winningNumbers.length).fill('')
+    cardStates.value = Array(props.winningNumbers.length).fill(false)
   }
 }
 

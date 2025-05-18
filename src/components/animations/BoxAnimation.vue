@@ -31,16 +31,39 @@ watch(() => props.winningNumbers, (newNumbers) => {
   displayNumbers.value = Array(newNumbers.length).fill('')
 }, { immediate: true })
 
+// 監聽動畫狀態
+watch(() => props.isAnimating, (isAnimating) => {
+  if (!isAnimating) {
+    isShaking.value = false
+    // 清空顯示的號碼
+    displayNumbers.value = Array(props.winningNumbers.length).fill('')
+  }
+})
+
 async function animate(duration: number): Promise<void> {
   const delayPerBox = duration / props.winningNumbers.length
   isShaking.value = true
 
   for (let i = 0; i < props.winningNumbers.length; i++) {
+    if (!props.isAnimating) {
+      // 清空顯示的號碼
+      displayNumbers.value = Array(props.winningNumbers.length).fill('')
+      break
+    }
     await new Promise(resolve => setTimeout(resolve, delayPerBox / 2))
+    if (!props.isAnimating) {
+      // 清空顯示的號碼
+      displayNumbers.value = Array(props.winningNumbers.length).fill('')
+      break
+    }
     displayNumbers.value[i] = props.winningNumbers[i]
     await new Promise(resolve => setTimeout(resolve, delayPerBox / 2))
   }
 
+  if (!props.isAnimating) {
+    // 清空顯示的號碼
+    displayNumbers.value = Array(props.winningNumbers.length).fill('')
+  }
   isShaking.value = false
 }
 

@@ -2,25 +2,25 @@
   "name": "抽獎助手",
   "short_name": "抽獎助手",
   "description": "多功能抽獎工具，支持活動抽獎、課堂點名、獎項管理等功能",
-  "start_url": "/",
+  "start_url": "/choujiangzhushou/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1976D2",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/favicon.ico",
+      "src": "/choujiangzhushou/favicon.ico",
       "sizes": "64x64",
       "type": "image/x-icon"
     },
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "/choujiangzhushou/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "/choujiangzhushou/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

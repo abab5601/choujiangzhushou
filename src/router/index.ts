@@ -1,11 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import TicketInputView from '../views/TicketInputView.vue'
 import DrawResultsView from '../views/DrawResultsView.vue'
 import HistoryView from '../views/HistoryView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
@@ -23,8 +23,8 @@ const router = createRouter({
       component: DrawResultsView
     },
     {
-      path: '/history',
-      name: 'history',
+      path: '/management',
+      name: 'management',
       component: HistoryView
     }
   ]

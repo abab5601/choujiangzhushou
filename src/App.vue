@@ -6,9 +6,9 @@
       <v-spacer></v-spacer>
       <v-tabs>
         <v-tab :to="{ name: 'home' }">首頁</v-tab>
-        <v-tab :to="{ name: 'input' }">輸入號碼</v-tab>
-        <v-tab :to="{ name: 'results' }">開獎結果</v-tab>
-        <v-tab :to="{ name: 'history' }">歷史記錄</v-tab>
+        <v-tab :to="{ name: 'input' }">添加獎號</v-tab>
+        <v-tab :to="{ name: 'results' }">自動對獎</v-tab>
+        <v-tab :to="{ name: 'management' }">抽獎管理</v-tab>
       </v-tabs>
     </v-app-bar>
 

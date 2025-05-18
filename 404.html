@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" href="/icons/icon-512x512.png" sizes="512x512">
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>抽獎助手 - 多功能抽獎工具｜活動抽獎｜課堂點名｜獎項管理</title>
+    <title>抽獎助手 - 重定向中...</title>
     
     <!-- SEO Meta Tags -->
     <meta name="description" content="抽獎助手是一款全能的抽獎工具，適用於各種場景：活動抽獎、課堂隨機點名、公司年會抽獎、粉絲互動抽獎、尾牙摸彩、線上直播抽獎等。提供公平公正的隨機抽獎、獎項管理、中獎記錄等功能。">
@@ -54,25 +54,31 @@
     
     <!-- Manifest -->
     <link rel="manifest" href="/manifest.json">
-    <script type="text/javascript">
-      // 單頁應用的 GitHub Pages 重定向
-      (function(){
-        var l = window.location;
-        var path = l.pathname.replace(/^\/choujiangzhushou/, '');
-        if (path === '/404.html') {
-          path = window.sessionStorage.getItem('redirect') || '/';
-        } else {
-          window.sessionStorage.setItem('redirect', path);
-        }
-        l.replace(
-          l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-          '/choujiangzhushou' + path + (l.search || '') + (l.hash || '')
-        );
-      })();
+    <script>
+        // GitHub Pages SPA 重定向
+        (function() {
+            const segments = window.location.pathname.split('/');
+            const repoName = 'choujiangzhushou';
+            
+            // 如果是在 404 頁面
+            if (segments.includes('404.html')) {
+                // 從 sessionStorage 獲取保存的路徑
+                const savedPath = sessionStorage.getItem('path');
+                if (savedPath) {
+                    window.location.replace(savedPath);
+                } else {
+                    // 如果沒有保存的路徑，返回首頁
+                    window.location.replace('/choujiangzhushou/');
+                }
+            } else {
+                // 不是 404 頁面，保存當前路徑
+                const fullPath = window.location.href;
+                sessionStorage.setItem('path', fullPath);
+            }
+        })();
     </script>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <p style="text-align: center; padding: 20px;">重定向中，請稍候...</p>
   </body>
 </html> 

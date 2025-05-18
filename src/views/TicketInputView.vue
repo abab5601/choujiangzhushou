@@ -147,7 +147,6 @@ const batchTicketCount = computed(() => {
 const rangeTicketCount = computed(() => {
   if (!rangeStart.value || !rangeEnd.value) return 0
   
-  const prefix = rangeStart.value.match(/^[A-Z]+/)?.[0] || ''
   const startNum = parseInt(rangeStart.value.replace(/^[A-Z]+/, ''))
   const endNum = parseInt(rangeEnd.value.replace(/^[A-Z]+/, ''))
   

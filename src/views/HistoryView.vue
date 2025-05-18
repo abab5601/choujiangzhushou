@@ -32,6 +32,7 @@
               hide-details
               :error="!!fileError"
               :error-messages="fileError"
+              :multiple="false"
             />
           </v-card-text>
         </v-card>
@@ -135,9 +136,9 @@ function exportData() {
   showNotification('數據導出成功', 'success')
 }
 
-async function handleFileChange(file: File | null) {
+async function handleFileChange(file: File | File[] | null) {
   fileError.value = ''
-  if (!file) return
+  if (!file || Array.isArray(file)) return
 
   try {
     console.log('開始讀取文件:', file.name)

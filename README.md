@@ -1,8 +1,6 @@
 # 彩票助手 (Lottery Assistant)
 
 一個使用 Vue 3 + TypeScript + Vuetify 3 開發的彩票管理應用。
-<<<<<<< HEAD
-=======
 
 ## 分支管理
 
@@ -50,7 +48,6 @@
 2. 定期將 `main` 分支的更改合併到 `tracking` 分支
 3. 在 `tracking` 分支上進行構建
 4. 將構建結果推送到 `gh-pages` 分支
->>>>>>> main
 
 ## 功能特點
 
@@ -87,10 +84,6 @@
 
 訪問 [GitHub Pages 演示](https://abab5601.github.io/choujiangzhushou/) 查看應用。
 
-## 在線演示
-
-訪問 [GitHub 倉庫](https://github.com/abab5601/choujiangzhushou) 查看專案。
-
 ## 技術棧
 
 - Vue 3
@@ -99,10 +92,7 @@
 - Vite
 - Pinia (狀態管理)
 - Vue Router
-<<<<<<< HEAD
 - Google Analytics
-=======
->>>>>>> main
 
 ## 本地開發
 

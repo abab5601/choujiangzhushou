@@ -5,29 +5,44 @@
       <v-card-title class="d-flex align-center">
         開獎結果
         <v-spacer />
-        <v-btn
-          color="info"
-          prepend-icon="mdi-history"
-          @click="showWinningHistoryDialog = true"
-          class="me-2"
-        >
-          歷史開獎
-        </v-btn>
-        <v-btn
-          color="primary"
-          prepend-icon="mdi-dice-multiple"
-          @click="showDrawDialog = true"
-          class="me-2"
-        >
-          隨機抽獎
-        </v-btn>
-        <v-btn
-          color="success"
-          prepend-icon="mdi-ticket-confirmation"
-          @click="showWinningNumberDialog = true"
-        >
-          輸入中獎號碼
-        </v-btn>
+        <v-tooltip text="查看所有歷史開獎記錄">
+          <template v-slot:activator="{ props }">
+            <v-btn
+              color="info"
+              prepend-icon="mdi-history"
+              @click="showWinningHistoryDialog = true"
+              class="me-2"
+              v-bind="props"
+            >
+              歷史開獎
+            </v-btn>
+          </template>
+        </v-tooltip>
+        <v-tooltip text="從未中獎的號碼中隨機抽取指定數量">
+          <template v-slot:activator="{ props }">
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-dice-multiple"
+              @click="showDrawDialog = true"
+              class="me-2"
+              v-bind="props"
+            >
+              隨機抽獎
+            </v-btn>
+          </template>
+        </v-tooltip>
+        <v-tooltip text="手動輸入中獎號碼進行兌獎">
+          <template v-slot:activator="{ props }">
+            <v-btn
+              color="success"
+              prepend-icon="mdi-ticket-confirmation"
+              @click="showWinningNumberDialog = true"
+              v-bind="props"
+            >
+              輸入中獎號碼
+            </v-btn>
+          </template>
+        </v-tooltip>
       </v-card-title>
 
       <v-card-text>
@@ -38,6 +53,8 @@
               label="搜索彩票"
               prepend-inner-icon="mdi-magnify"
               clearable
+              hint="輸入號碼進行搜索"
+              persistent-hint
             />
           </v-col>
           <v-col cols="12" sm="6">
@@ -49,6 +66,8 @@
                 { title: '未中獎', value: 'non-winners' }
               ]"
               label="篩選狀態"
+              hint="選擇要顯示的彩票狀態"
+              persistent-hint
             />
           </v-col>
         </v-row>
@@ -71,25 +90,35 @@
           </template>
 
           <template v-slot:item.actions="{ item }">
-            <v-btn
-              icon
-              variant="text"
-              :color="item.isWinner ? 'error' : 'success'"
-              @click="toggleWinnerStatus(item.id)"
-              class="me-2"
-            >
-              <v-icon>
-                {{ item.isWinner ? 'mdi-close' : 'mdi-check' }}
-              </v-icon>
-            </v-btn>
-            <v-btn
-              icon
-              variant="text"
-              color="error"
-              @click="confirmDelete(item)"
-            >
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
+            <v-tooltip :text="item.isWinner ? '取消中獎' : '標記中獎'">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  icon
+                  variant="text"
+                  :color="item.isWinner ? 'error' : 'success'"
+                  @click="toggleWinnerStatus(item.id)"
+                  class="me-2"
+                  v-bind="props"
+                >
+                  <v-icon>
+                    {{ item.isWinner ? 'mdi-close' : 'mdi-check' }}
+                  </v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
+            <v-tooltip text="刪除此號碼">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  icon
+                  variant="text"
+                  color="error"
+                  @click="confirmDelete(item)"
+                  v-bind="props"
+                >
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
           </template>
         </v-data-table>
       </v-card-text>
@@ -100,6 +129,7 @@
       <v-card>
         <v-card-title>隨機抽獎</v-card-title>
         <v-card-text>
+          <p class="text-subtitle-2 mb-4">從未中獎的號碼中隨機抽取指定數量的中獎號碼</p>
           <v-form @submit.prevent="executeRandomDraw">
             <v-text-field
               v-model.number="numberOfWinners"
@@ -112,12 +142,15 @@
                 v => v > 0 || '必須大於0',
                 v => v <= store.tickets.length || '不能超過總票數'
               ]"
+              hint="請輸入要抽取的中獎數量"
+              persistent-hint
             />
             <v-btn
               type="submit"
               color="primary"
               block
               :disabled="!numberOfWinners || numberOfWinners <= 0"
+              class="mt-4"
             >
               開始抽獎
             </v-btn>
@@ -131,6 +164,7 @@
       <v-card>
         <v-card-title>輸入中獎號碼</v-card-title>
         <v-card-text>
+          <p class="text-subtitle-2 mb-4">輸入官方公布的中獎號碼，系統將自動比對並標記中獎彩票</p>
           <v-form @submit.prevent="checkWinningNumbers">
             <v-textarea
               v-model="winningNumbers"
@@ -139,12 +173,15 @@
               :rules="[v => !!v || '請輸入中獎號碼']"
               rows="5"
               auto-grow
+              hint="可以用逗號或換行來分隔多個號碼"
+              persistent-hint
             />
             <v-btn
               type="submit"
               color="success"
               block
               :disabled="!winningNumbers"
+              class="mt-4"
             >
               確認中獎號碼
             </v-btn>
@@ -362,8 +399,18 @@ function executeRandomDraw() {
     store.addWinningHistory(entry)
   }
   
+  // 準備顯示結果
+  lotteryResults.value = {
+    matched: selectedWinners.map(ticket => ({
+      number: ticket.number,
+      isNew: true
+    })),
+    notFound: []
+  }
+  
   showDrawDialog.value = false
   numberOfWinners.value = 1
+  showResultsDialog.value = true // 顯示結果對話框
   showNotification(`已選出 ${count} 個中獎號碼`, 'success')
 }
 

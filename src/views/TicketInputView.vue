@@ -17,6 +17,7 @@
                 label="彩票號碼"
                 placeholder="例如：A123X"
                 :rules="[v => !!v || '請輸入彩票號碼']"
+                clearable
               />
               <v-btn
                 type="submit"
@@ -38,6 +39,7 @@
                 placeholder="每行輸入一個號碼，或用逗號分隔"
                 :rules="[v => !!v || '請輸入彩票號碼']"
                 rows="5"
+                clearable
               />
               <div class="text-caption mb-2">
                 當前輸入：{{ batchTicketCount }} 張彩票
@@ -63,6 +65,7 @@
                     label="起始號碼"
                     placeholder="例如：A001"
                     :rules="[v => !!v || '請輸入起始號碼']"
+                    clearable
                   />
                 </v-col>
                 <v-col cols="12" sm="6">
@@ -71,6 +74,7 @@
                     label="結束號碼"
                     placeholder="例如：A100"
                     :rules="[v => !!v || '請輸入結束號碼']"
+                    clearable
                   />
                 </v-col>
               </v-row>
@@ -103,12 +107,17 @@
             :subtitle="new Date(ticket.timestamp).toLocaleString('zh-TW')"
           >
             <template v-slot:append>
-              <v-btn
-                icon="mdi-delete"
-                variant="text"
-                color="error"
-                @click="removeTicket(ticket.id)"
-              />
+              <v-tooltip text="刪除此號碼">
+                <template v-slot:activator="{ props }">
+                  <v-btn
+                    icon="mdi-delete"
+                    variant="text"
+                    color="error"
+                    @click="removeTicket(ticket.id)"
+                    v-bind="props"
+                  />
+                </template>
+              </v-tooltip>
             </template>
           </v-list-item>
         </v-list>

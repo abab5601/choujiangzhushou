@@ -2,7 +2,7 @@
 <template>
   <v-app>
     <v-app-bar>
-      <v-app-bar-title>彩票助手</v-app-bar-title>
+      <v-app-bar-title>抽獎助手</v-app-bar-title>
       <v-spacer></v-spacer>
       <v-tabs>
         <v-tab :to="{ name: 'home' }">首頁</v-tab>

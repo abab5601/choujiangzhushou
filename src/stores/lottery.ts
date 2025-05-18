@@ -169,6 +169,13 @@ export const useLotteryStore = defineStore('lottery', {
           error: error instanceof Error ? error.message : '導入數據時出錯'
         }
       }
+    },
+
+    clearAllData() {
+      this.tickets = []
+      this.winners = []
+      this.winningHistory = []
+      this.saveToStorage()
     }
   }
 }) 

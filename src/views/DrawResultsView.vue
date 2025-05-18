@@ -144,7 +144,29 @@
               ]"
               hint="請輸入要抽取的中獎數量"
               persistent-hint
+              class="mb-4"
             />
+            <div class="d-flex align-center">
+              <v-select
+                v-model="selectedAnimation"
+                :items="animationOptions"
+                label="抽獎動畫"
+                hint="選擇抽獎過程的動畫效果"
+                persistent-hint
+                class="flex-grow-1 me-2"
+              />
+              <v-btn
+                v-if="showRememberButton"
+                color="primary"
+                variant="outlined"
+                size="small"
+                class="mt-3"
+                @click="saveAnimationPreference"
+              >
+                <v-icon start>mdi-content-save</v-icon>
+                記住選擇
+              </v-btn>
+            </div>
             <v-btn
               type="submit"
               color="primary"
@@ -305,14 +327,38 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- 動畫對話框 -->
+    <v-dialog v-model="showAnimationDialog" persistent max-width="600">
+      <v-card>
+        <v-card-text class="text-center pa-6">
+          <div class="animation-container">
+            <component
+              :is="currentAnimationComponent"
+              v-if="currentAnimationComponent"
+              ref="animationRef"
+              :winning-numbers="selectedNumbers"
+              :available-numbers="availableNumbers"
+              :is-animating="isAnimating"
+            />
+            <div v-if="!isAnimating" class="text-h5 mb-4">
+              抽獎完成！
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, shallowRef, watch } from 'vue'
 import { useLotteryStore, type WinningHistoryEntry } from '@/stores/lottery'
 import confetti from 'canvas-confetti'
 import { updateMetaInfo } from '@/utils/seo'
+import SlotMachineAnimation from '@/components/animations/SlotMachineAnimation.vue'
+import CardAnimation from '@/components/animations/CardAnimation.vue'
+import BoxAnimation from '@/components/animations/BoxAnimation.vue'
 
 const store = useLotteryStore()
 
@@ -348,6 +394,8 @@ const showSnackbar = ref(false)
 const snackbarText = ref('')
 const snackbarColor = ref('success')
 const showResultsDialog = ref(false)
+const showAnimationDialog = ref(false)
+const isAnimating = ref(false)
 const lotteryResults = ref({
   matched: [] as { number: string; isNew: boolean }[],
   notFound: [] as string[]
@@ -356,6 +404,43 @@ const lotteryResults = ref({
 // Add new refs for delete confirmation
 const showDeleteDialog = ref(false)
 const ticketToDelete = ref<{ id: string; number: string } | null>(null)
+
+// 動畫選項
+const selectedAnimation = ref(localStorage.getItem('preferredAnimation') || 'box')  // 從 localStorage 讀取保存的選擇
+
+// 添加記住選擇的狀態
+const showRememberButton = ref(false)
+const lastSavedAnimation = ref(localStorage.getItem('preferredAnimation') || 'box')
+
+// 監聽動畫選擇的變化
+watch(() => selectedAnimation.value, (newValue) => {
+  if (newValue !== lastSavedAnimation.value) {
+    showRememberButton.value = true
+  } else {
+    showRememberButton.value = false
+  }
+})
+
+// 保存動畫選擇
+function saveAnimationPreference() {
+  localStorage.setItem('preferredAnimation', selectedAnimation.value)
+  lastSavedAnimation.value = selectedAnimation.value
+  showRememberButton.value = false
+  showNotification('已記住您的動畫選擇', 'success')
+}
+
+const animationOptions = [
+  { title: '抽獎箱效果', value: 'box' },
+  { title: '老虎機效果', value: 'slot' },
+  { title: '翻牌效果', value: 'card' },
+  { title: '無動畫', value: 'none' }
+]
+
+// 動畫相關
+const animationRef = ref()
+const selectedNumbers = ref<string[]>([])
+const availableNumbers = computed(() => store.tickets.filter(t => !t.isWinner).map(t => t.number))
+const currentAnimationComponent = shallowRef<any>(null)
 
 const headers = [
   { title: '彩票號碼', key: 'number' },
@@ -455,58 +540,106 @@ async function toggleWinnerStatus(id: string) {
   }
 }
 
+// 修改動畫函數
+async function playDrawAnimation(numbers: string[]): Promise<void> {
+  selectedNumbers.value = numbers
+  
+  // 如果選擇無動畫，直接顯示結果
+  if (selectedAnimation.value === 'none') {
+    lotteryResults.value = {
+      matched: numbers.map(number => ({ number, isNew: true })),
+      notFound: []
+    }
+    showResultsDialog.value = true
+    return
+  }
+
+  showAnimationDialog.value = true
+  isAnimating.value = true
+
+  // 設置當前動畫組件
+  switch (selectedAnimation.value) {
+    case 'slot':
+      currentAnimationComponent.value = SlotMachineAnimation
+      break
+    case 'card':
+      currentAnimationComponent.value = CardAnimation
+      break
+    case 'box':
+      currentAnimationComponent.value = BoxAnimation
+      break
+  }
+
+  try {
+    // 等待組件掛載
+    await new Promise(resolve => setTimeout(resolve, 100))
+    
+    // 執行動畫
+    await animationRef.value?.animate(3000, 50)
+    
+    isAnimating.value = false
+    showWinningAnimation() // 顯示中獎彩帶效果
+    
+    // 更新抽獎結果
+    lotteryResults.value = {
+      matched: numbers.map(number => ({ number, isNew: true })),
+      notFound: []
+    }
+
+    // 等待一小段時間後自動關閉動畫對話框並顯示結果
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    showAnimationDialog.value = false
+    showResultsDialog.value = true
+
+  } catch (error) {
+    console.error('動畫播放出錯:', error)
+    showNotification('動畫播放出錯', 'error')
+    isAnimating.value = false
+    showAnimationDialog.value = false
+  }
+}
+
+// 修改原有的抽獎函數
 async function executeRandomDraw(e: Event) {
   e.preventDefault()
   if (!numberOfWinners.value || numberOfWinners.value <= 0) return
 
-  const nonWinners = store.tickets.filter(t => !t.isWinner)
-  if (nonWinners.length === 0) {
-    snackbarText.value = '沒有可抽獎的號碼'
-    snackbarColor.value = 'warning'
-    showSnackbar.value = true
+  const nonWinningTickets = store.tickets.filter(t => !t.isWinner)
+  if (nonWinningTickets.length === 0) {
+    showNotification('沒有可抽取的號碼', 'warning')
     return
   }
 
-  try {
-    // 隨機抽取指定數量的中獎號碼
-    const shuffled = [...nonWinners].sort(() => Math.random() - 0.5)
-    const winners = shuffled.slice(0, numberOfWinners.value)
-
-    // 準備結果顯示
-    lotteryResults.value = {
-      matched: [],
-      notFound: []
-    }
-
-    // 更新中獎狀態
-    for (const winner of winners) {
-      store.markAsWinner(winner.id)
-      lotteryResults.value.matched.push({
-        number: winner.number,
-        isNew: true
-      })
-    }
-
-    // 記錄本次抽獎
-    store.addWinningHistory({
-      timestamp: Date.now(),
-      numbers: winners.map(w => w.number).join(', ')
-    })
-
-    showDrawDialog.value = false
-    snackbarText.value = `已成功抽出 ${winners.length} 個中獎號碼`
-    snackbarColor.value = 'success'
-    showSnackbar.value = true
-    showResultsDialog.value = true  // 顯示結果對話框
-    
-    // 觸發彩帶效果
-    showWinningAnimation()
-  } catch (error) {
-    console.error('抽獎過程中出錯:', error)
-    snackbarText.value = '抽獎過程中出錯'
-    snackbarColor.value = 'error'
-    showSnackbar.value = true
+  if (numberOfWinners.value > nonWinningTickets.length) {
+    showNotification(`只剩下 ${nonWinningTickets.length} 個可抽取的號碼`, 'warning')
+    return
   }
+
+  // 隨機選擇中獎號碼
+  const selectedTickets = []
+  const tempTickets = [...nonWinningTickets]
+  for (let i = 0; i < numberOfWinners.value; i++) {
+    const index = Math.floor(Math.random() * tempTickets.length)
+    selectedTickets.push(tempTickets[index])
+    tempTickets.splice(index, 1)
+  }
+
+  // 執行動畫
+  await playDrawAnimation(selectedTickets.map(t => t.number))
+
+  // 標記中獎
+  for (const ticket of selectedTickets) {
+    store.markAsWinner(ticket.id)
+  }
+
+  // 添加到開獎歷史
+  store.addWinningHistory({
+    timestamp: Date.now(),
+    numbers: selectedTickets.map(t => t.number).join(', ')
+  })
+
+  showDrawDialog.value = false
+  showNotification(`已抽出 ${selectedTickets.length} 個中獎號碼`, 'success')
 }
 
 async function checkWinningNumbers(e: Event) {
@@ -612,5 +745,18 @@ function deleteTicket() {
   z-index: 10000 !important;
   position: fixed !important;
   pointer-events: none !important;
+}
+
+.animation-container {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.v-btn.mt-3 {
+  margin-bottom: 16px; /* 調整按鈕垂直對齊 */
 }
 </style> 

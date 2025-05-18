@@ -28,6 +28,10 @@
 - 💾 數據管理
   - 本地數據持久化
   - 數據導入導出功能
+- 📈 使用分析
+  - Google Analytics 整合
+  - 用戶行為追蹤
+  - 頁面訪問統計
 
 ## 在線演示
 
@@ -41,6 +45,7 @@
 - Vite
 - Pinia (狀態管理)
 - Vue Router
+- Google Analytics
 
 ## 本地開發
 

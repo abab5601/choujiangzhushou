@@ -30,7 +30,7 @@
         </span>
         <span class="mx-1">|</span>
         <a
-          href="https://github.com/yourusername/choujiangzhushou"
+          href="https://github.com/abab5601/choujiangzhushou"
           target="_blank"
           rel="noopener noreferrer"
           class="text-caption text-decoration-none"

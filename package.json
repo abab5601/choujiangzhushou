@@ -1,17 +1,21 @@
 {
   "name": "choujiangzhushou",
+  "homepage": "https://abab5601.github.io/choujiangzhushou/",
   "version": "1.1.1",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "@types/canvas-confetti": "^1.9.0",
     "canvas-confetti": "^1.9.3",
+    "gh-pages": "^6.3.0",
     "pinia": "^3.0.2",
     "vue": "^3.4.19",
     "vue-router": "^4.5.1",

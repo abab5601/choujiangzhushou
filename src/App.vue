@@ -41,10 +41,14 @@
         Version 1.1.1
       </div>
     </v-footer>
+
+    <!-- Cookie 同意聲明對話框 -->
+    <CookieConsent />
   </v-app>
 </template>
 
 <script setup lang="ts">
+import CookieConsent from '@/components/CookieConsent.vue'
 </script>
 
 <style>

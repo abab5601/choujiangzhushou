@@ -2,47 +2,48 @@
 <template>
   <div class="draw-results-view">
     <v-card>
-      <v-card-title class="d-flex align-center">
-        開獎結果
-        <v-spacer />
-        <v-tooltip text="查看所有歷史開獎記錄">
-          <template v-slot:activator="{ props }">
-            <v-btn
-              color="info"
-              prepend-icon="mdi-history"
-              @click="showWinningHistoryDialog = true"
-              class="me-2"
-              v-bind="props"
-            >
-              歷史開獎
-            </v-btn>
-          </template>
-        </v-tooltip>
-        <v-tooltip text="從未中獎的號碼中隨機抽取指定數量">
-          <template v-slot:activator="{ props }">
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-dice-multiple"
-              @click="showDrawDialog = true"
-              class="me-2"
-              v-bind="props"
-            >
-              隨機抽獎
-            </v-btn>
-          </template>
-        </v-tooltip>
-        <v-tooltip text="手動輸入中獎號碼進行兌獎">
-          <template v-slot:activator="{ props }">
-            <v-btn
-              color="success"
-              prepend-icon="mdi-ticket-confirmation"
-              @click="showWinningNumberDialog = true"
-              v-bind="props"
-            >
-              輸入中獎號碼
-            </v-btn>
-          </template>
-        </v-tooltip>
+      <v-card-title>
+        <div class="d-flex flex-wrap align-center w-100">
+          <span class="me-auto mb-2">開獎結果</span>
+          <div class="d-flex flex-wrap gap-2">
+            <v-tooltip text="查看所有歷史開獎記錄">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  color="info"
+                  prepend-icon="mdi-history"
+                  @click="showWinningHistoryDialog = true"
+                  v-bind="props"
+                >
+                  歷史開獎
+                </v-btn>
+              </template>
+            </v-tooltip>
+            <v-tooltip text="從未中獎的號碼中隨機抽取指定數量">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  color="primary"
+                  prepend-icon="mdi-dice-multiple"
+                  @click="showDrawDialog = true"
+                  v-bind="props"
+                >
+                  隨機抽獎
+                </v-btn>
+              </template>
+            </v-tooltip>
+            <v-tooltip text="手動輸入中獎號碼進行兌獎">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  color="success"
+                  prepend-icon="mdi-ticket-confirmation"
+                  @click="showWinningNumberDialog = true"
+                  v-bind="props"
+                >
+                  輸入中獎號碼
+                </v-btn>
+              </template>
+            </v-tooltip>
+          </div>
+        </div>
       </v-card-title>
 
       <v-card-text>
@@ -215,7 +216,17 @@
     <!-- Winning History Dialog -->
     <v-dialog v-model="showWinningHistoryDialog" max-width="600px">
       <v-card>
-        <v-card-title>歷史開獎記錄</v-card-title>
+        <v-card-title class="d-flex align-center">
+          歷史開獎記錄
+          <v-spacer></v-spacer>
+          <v-btn
+            icon
+            variant="text"
+            @click="showWinningHistoryDialog = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
         <v-card-text>
           <v-data-table
             :headers="[

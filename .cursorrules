@@ -1,9 +1,5 @@
 git 裡面
 main分支為主要開發用
 tracking分支為增加部屬SEO資訊與google追蹤功能
-gh-pages 只放靜態網頁 由tracking分支部屬 並且加入tracking的README.md文件
 
-
-
-
-
+發布請使用 pnpm run deploy

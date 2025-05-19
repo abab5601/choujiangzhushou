@@ -23,9 +23,32 @@ export const useLotteryStore = defineStore('lottery', () => {
   const winners = ref<Ticket[]>([])
   const winningHistory = ref<WinningHistoryEntry[]>([])
 
+  // 在 store 創建時立即加載數據
+  try {
+    const savedTickets = localStorage.getItem('lottery-tickets')
+    const savedHistory = localStorage.getItem('lottery-winning-history')
+    
+    if (savedTickets) {
+      tickets.value = JSON.parse(savedTickets)
+      winners.value = tickets.value.filter(t => t.isWinner)
+    }
+
+    if (savedHistory) {
+      winningHistory.value = JSON.parse(savedHistory)
+    }
+  } catch (error) {
+    console.error('初始化加載數據失敗:', error)
+  }
+
   // 監聽 tickets 變化，自動更新 winners
   watch(tickets, (newTickets) => {
     winners.value = newTickets.filter(t => t.isWinner)
+    saveToStorage()  // 當數據變化時自動保存
+  }, { deep: true })
+
+  // 監聽 winningHistory 變化，自動保存
+  watch(winningHistory, () => {
+    saveToStorage()
   }, { deep: true })
 
   function loadFromStorage() {

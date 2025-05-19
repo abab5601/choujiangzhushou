@@ -1,29 +1,16 @@
 <!-- src/App.vue -->
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>抽獎助手</v-toolbar-title>
+    <v-app-bar>
+      <v-app-bar-title>抽獎助手</v-app-bar-title>
+      <v-spacer></v-spacer>
+      <v-tabs>
+        <v-tab :to="{ name: 'home' }">首頁</v-tab>
+        <v-tab :to="{ name: 'input' }">添加獎號</v-tab>
+        <v-tab :to="{ name: 'results' }">自動對獎</v-tab>
+        <v-tab :to="{ name: 'management' }">抽獎管理</v-tab>
+      </v-tabs>
     </v-app-bar>
-
-    <v-navigation-drawer
-      v-model="drawer"
-      app
-    >
-      <v-list>
-        <v-list-item
-          v-for="item in menuItems"
-          :key="item.title"
-          :to="item.to"
-          :prepend-icon="item.icon"
-          :title="item.title"
-        />
-      </v-list>
-    </v-navigation-drawer>
 
     <v-main>
       <router-view v-slot="{ Component }">
@@ -67,18 +54,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import CookieConsent from '@/components/CookieConsent.vue'
 import WelcomeDialog from '@/components/WelcomeDialog.vue'
-
-const drawer = ref(false)
-
-const menuItems = [
-  { title: '首頁', icon: 'mdi-home', to: '/' },
-  { title: '輸入獎號', icon: 'mdi-ticket', to: '/input' },
-  { title: '開獎結果', icon: 'mdi-star', to: '/results' },
-  { title: '歷史記錄', icon: 'mdi-history', to: '/history' }
-]
 
 function handleWelcomeClose() {
   // 可以在這裡添加額外的處理邏輯

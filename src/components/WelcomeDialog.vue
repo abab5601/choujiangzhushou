@@ -3,7 +3,6 @@
   <v-dialog
     v-model="showDialog"
     max-width="600"
-    persistent
   >
     <v-card>
       <v-card-title class="text-h5 d-flex align-center">

@@ -4,9 +4,14 @@
   "description": "多功能抽獎工具，支持活動抽獎、課堂點名、獎項管理等功能",
   "start_url": "/choujiangzhushou/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay"],
   "background_color": "#ffffff",
   "theme_color": "#1976D2",
   "form_factor": "wide",
+  "categories": ["utilities", "productivity"],
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
   "icons": [
     {
       "src": "/choujiangzhushou/favicon.ico",
